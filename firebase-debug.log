@@ -134,3 +134,99 @@ To learn about active projects for the CLI, visit https://firebase.google.com/do
 [error] Error: Your project app-asistencia-estudiant-4644b must be on the Blaze (pay-as-you-go) plan to complete this command. Required API cloudbuild.googleapis.com can't be enabled until the upgrade is complete. To upgrade, visit the following URL:
 
 https://console.firebase.google.com/project/app-asistencia-estudiant-4644b/usage/details
+[debug] [2025-08-21T15:38:52.895Z] ----------------------------------------------------------------------
+[debug] [2025-08-21T15:38:52.899Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\bynac\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions
+[debug] [2025-08-21T15:38:52.899Z] CLI Version:   14.13.0
+[debug] [2025-08-21T15:38:52.899Z] Platform:      win32
+[debug] [2025-08-21T15:38:52.899Z] Node Version:  v22.18.0
+[debug] [2025-08-21T15:38:52.899Z] Time:          Thu Aug 21 2025 12:38:52 GMT-0300 (hora estándar de Argentina)
+[debug] [2025-08-21T15:38:52.900Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-21T15:38:53.102Z] Checked if tokens are valid: false, expires at: 1755781736840
+[debug] [2025-08-21T15:38:53.103Z] Checked if tokens are valid: false, expires at: 1755781736840
+[debug] [2025-08-21T15:38:53.103Z] > refreshing access token with scopes: []
+[debug] [2025-08-21T15:38:53.105Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-08-21T15:38:53.105Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-21T15:38:53.301Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-08-21T15:38:53.302Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-21T15:38:53.316Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/undefined/serviceAccounts/undefined@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-08-21T15:38:53.317Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/undefined/serviceAccounts/undefined@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-08-21T15:38:54.285Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/undefined/serviceAccounts/undefined@appspot.gserviceaccount.com:testIamPermissions 404
+[debug] [2025-08-21T15:38:54.285Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/undefined/serviceAccounts/undefined@appspot.gserviceaccount.com:testIamPermissions {"error":{"code":404,"message":"Unknown service account","status":"NOT_FOUND"}}
+[debug] [2025-08-21T15:38:54.285Z] [functions] service account IAM check errored, deploy may fail: Request to https://iam.googleapis.com/v1/projects/undefined/serviceAccounts/undefined@appspot.gserviceaccount.com:testIamPermissions had HTTP Error: 404, Unknown service account {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":404,"message":"Unknown service account","status":"NOT_FOUND"}},"response":{"statusCode":404}},"exit":1,"message":"Request to https://iam.googleapis.com/v1/projects/undefined/serviceAccounts/undefined@appspot.gserviceaccount.com:testIamPermissions had HTTP Error: 404, Unknown service account","status":404}
+[error] 
+[error] Error: No currently active project.
+To run this command, you need to specify a project. You have two options:
+- Run this command with --project <alias_or_project_id>.
+- Set an active project by running firebase use --add, then rerun this command.
+To list all the Firebase projects to which you have access, run firebase projects:list.
+To learn about active projects for the CLI, visit https://firebase.google.com/docs/cli#project_aliases
+
+
+[debug] [2025-08-21T15:42:58.067Z] ----------------------------------------------------------------------
+[debug] [2025-08-21T15:42:58.070Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\bynac\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions --project app-asistencia-estudiant-4644b
+[debug] [2025-08-21T15:42:58.070Z] CLI Version:   14.13.0
+[debug] [2025-08-21T15:42:58.070Z] Platform:      win32
+[debug] [2025-08-21T15:42:58.071Z] Node Version:  v22.18.0
+[debug] [2025-08-21T15:42:58.071Z] Time:          Thu Aug 21 2025 12:42:58 GMT-0300 (hora estándar de Argentina)
+[debug] [2025-08-21T15:42:58.071Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-21T15:42:58.273Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-21T15:42:58.274Z] > authorizing via signed-in user (campopianoignacio@gmail.com)
+[debug] [2025-08-21T15:42:58.274Z] [iam] checking project app-asistencia-estudiant-4644b for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2025-08-21T15:42:58.275Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:42:58.276Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:42:58.277Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-asistencia-estudiant-4644b:testIamPermissions [none]
+[debug] [2025-08-21T15:42:58.277Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-asistencia-estudiant-4644b:testIamPermissions x-goog-quota-user=projects/app-asistencia-estudiant-4644b
+[debug] [2025-08-21T15:42:58.277Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-asistencia-estudiant-4644b:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-08-21T15:42:59.488Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-asistencia-estudiant-4644b:testIamPermissions 200
+[debug] [2025-08-21T15:42:59.488Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-asistencia-estudiant-4644b:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-08-21T15:42:59.489Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:42:59.489Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:42:59.490Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/serviceAccounts/app-asistencia-estudiant-4644b@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-08-21T15:42:59.490Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/serviceAccounts/app-asistencia-estudiant-4644b@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-08-21T15:43:00.353Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/serviceAccounts/app-asistencia-estudiant-4644b@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-08-21T15:43:00.353Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/serviceAccounts/app-asistencia-estudiant-4644b@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'app-asistencia-estudiant-4644b'...
+[info] 
+[info] i  deploying functions 
+[debug] [2025-08-21T15:43:00.358Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:00.358Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:00.358Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/app-asistencia-estudiant-4644b [none]
+[debug] [2025-08-21T15:43:00.586Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/app-asistencia-estudiant-4644b 200
+[debug] [2025-08-21T15:43:00.587Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/app-asistencia-estudiant-4644b {"projectNumber":"244136287239","projectId":"app-asistencia-estudiant-4644b","lifecycleState":"ACTIVE","name":"app-asistencia-estudiantil","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-08-21T12:04:38.919853Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[debug] [2025-08-21T15:43:00.593Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:00.593Z] Checked if tokens are valid: true, expires at: 1755794332302
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2025-08-21T15:43:00.594Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:00.594Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:00.595Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/cloudbuild.googleapis.com [none]
+[debug] [2025-08-21T15:43:00.595Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/cloudbuild.googleapis.com x-goog-quota-user=projects/app-asistencia-estudiant-4644b
+[debug] [2025-08-21T15:43:00.599Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/artifactregistry.googleapis.com [none]
+[debug] [2025-08-21T15:43:00.599Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/artifactregistry.googleapis.com x-goog-quota-user=projects/app-asistencia-estudiant-4644b
+[debug] [2025-08-21T15:43:01.995Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/artifactregistry.googleapis.com 200
+[debug] [2025-08-21T15:43:01.996Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/artifactregistry.googleapis.com [omitted]
+[warn] !  artifactregistry: missing required API artifactregistry.googleapis.com. Enabling now... 
+[debug] [2025-08-21T15:43:01.998Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:01.999Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:01.999Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/artifactregistry.googleapis.com:enable [none]
+[debug] [2025-08-21T15:43:02.000Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/artifactregistry.googleapis.com:enable x-goog-quota-user=projects/app-asistencia-estudiant-4644b
+[debug] [2025-08-21T15:43:02.008Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/cloudbuild.googleapis.com 200
+[debug] [2025-08-21T15:43:02.008Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/cloudbuild.googleapis.com [omitted]
+[warn] !  functions: missing required API cloudbuild.googleapis.com. Enabling now... 
+[debug] [2025-08-21T15:43:02.008Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:02.008Z] Checked if tokens are valid: true, expires at: 1755794332302
+[debug] [2025-08-21T15:43:02.009Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/cloudbuild.googleapis.com:enable [none]
+[debug] [2025-08-21T15:43:02.009Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/cloudbuild.googleapis.com:enable x-goog-quota-user=projects/app-asistencia-estudiant-4644b
+[debug] [2025-08-21T15:43:02.347Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/artifactregistry.googleapis.com:enable 400
+[debug] [2025-08-21T15:43:02.348Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/artifactregistry.googleapis.com:enable [omitted]
+[error] 
+[error] Error: Your project app-asistencia-estudiant-4644b must be on the Blaze (pay-as-you-go) plan to complete this command. Required API artifactregistry.googleapis.com can't be enabled until the upgrade is complete. To upgrade, visit the following URL:
+
+https://console.firebase.google.com/project/app-asistencia-estudiant-4644b/usage/details
+[debug] [2025-08-21T15:43:02.453Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/cloudbuild.googleapis.com:enable 400
+[debug] [2025-08-21T15:43:02.454Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/app-asistencia-estudiant-4644b/services/cloudbuild.googleapis.com:enable [omitted]

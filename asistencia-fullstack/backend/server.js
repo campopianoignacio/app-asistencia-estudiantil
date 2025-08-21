@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // --- Configuración ---
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 // Este es un "secreto" para firmar nuestros tokens. En una app real, debería estar en una variable de entorno y ser mucho más complejo.
 const JWT_SECRET = 'una-clave-secreta-muy-dificil-de-adivinar';
 
