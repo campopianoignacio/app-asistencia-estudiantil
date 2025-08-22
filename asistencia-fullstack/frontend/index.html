@@ -32,7 +32,12 @@
                 <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-gray-200 mb-6">Iniciar Sesión</h1>
                 <form id="login-form" class="space-y-4">
                     <input type="email" id="login-email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200" required>
-                    <input type="password" id="login-password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200" required>
+                    <div class="relative">
+                        <input type="password" id="login-password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 pr-10" required>
+                        <button type="button" id="toggle-login-password" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
                     <button type="submit" class="w-full p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">Entrar</button>
                 </form>
                 <p id="login-error" class="text-red-500 text-sm text-center mt-4"></p>
@@ -42,7 +47,12 @@
                 <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-gray-200 mb-6">Crear Cuenta</h1>
                 <form id="register-form" class="space-y-4">
                     <input type="email" id="register-email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200" required>
-                    <input type="password" id="register-password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200" required>
+                    <div class="relative">
+                        <input type="password" id="register-password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 pr-10" required>
+                        <button type="button" id="toggle-register-password" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
                     <button type="submit" class="w-full p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">Registrar</button>
                 </form>
                 <p id="register-error" class="text-red-500 text-sm text-center mt-4"></p>
@@ -142,12 +152,34 @@
             }
         }
 
+        function setupPasswordVisibilityToggle(inputId, buttonId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleButton = document.getElementById(buttonId);
+            const eyeIcon = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+            const eyeSlashedIcon = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 .946-3.11 3.563-5.534 6.88-6.461M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 2l20 20"></path></svg>`;
+
+            toggleButton.innerHTML = eyeIcon;
+
+            toggleButton.addEventListener('click', () => {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleButton.innerHTML = eyeSlashedIcon;
+                } else {
+                    passwordInput.type = 'password';
+                    toggleButton.innerHTML = eyeIcon;
+                }
+            });
+        }
+
         function initAuth() {
             document.getElementById('login-form').addEventListener('submit', handleLogin);
             document.getElementById('register-form').addEventListener('submit', handleRegister);
             document.getElementById('show-register').addEventListener('click', (e) => { e.preventDefault(); toggleAuthView(false); });
             document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); toggleAuthView(true); });
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
+
+            setupPasswordVisibilityToggle('login-password', 'toggle-login-password');
+            setupPasswordVisibilityToggle('register-password', 'toggle-register-password');
 
             if (getAuthToken()) {
                 showApp();
