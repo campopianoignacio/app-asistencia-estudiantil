@@ -1,7 +1,9 @@
 // 1. Importar paquetes
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken'); // Importamos la librería para JSON Web Tokens
+const jwt = require('jsonwebtoken');
+const { MongoClient, ObjectId } = require('mongodb'); // Importamos MongoClient y ObjectId
+const bcrypt = require('bcrypt'); // Importamos bcrypt
 
 // 2. Crear una instancia de Express
 const app = express();
@@ -12,94 +14,135 @@ app.use(express.json());
 
 // --- Configuración ---
 const PORT = process.env.PORT || 3000;
-// Este es un "secreto" para firmar nuestros tokens. En una app real, debería estar en una variable de entorno y ser mucho más complejo.
-const JWT_SECRET = 'una-clave-secreta-muy-dificil-de-adivinar';
+const JWT_SECRET = 'una-clave-secreta-muy-dificil-de-adivinar'; // En una app real, esto debería estar en una variable de entorno.
 
-// --- Base de datos en memoria (temporal) ---
-// Ahora cada usuario tendrá su propia propiedad 'data' para guardar sus estudiantes y asistencias.
-const users = [];
+// --- Conexión a la Base de Datos ---
+const MONGO_URI = "mongodb+srv://campopianoignacio:db_a2e3YivyVBn.h#j@cluster0.ak3l55y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const client = new MongoClient(MONGO_URI);
+
+let db;
+let usersCollection;
+
+async function connectDB() {
+  try {
+    await client.connect();
+    db = client.db('asistencia-app'); // Puedes nombrar tu base de datos como quieras
+    usersCollection = db.collection('users');
+    console.log("Conectado a MongoDB Atlas");
+  } catch (error) {
+    console.error("No se pudo conectar a MongoDB Atlas", error);
+    process.exit(1);
+  }
+}
 
 // ===================================================================================
 // RUTAS DE LA API
 // ===================================================================================
 
 app.get('/', (req, res) => {
-  res.send('¡El backend está funcionando con autenticación JWT!');
+  res.send('¡El backend está funcionando con MongoDB y JWT!');
 });
 
 // --- Rutas de Autenticación ---
 
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ message: 'El email y la contraseña son requeridos.' });
-  if (users.find(user => user.email === email)) return res.status(400).json({ message: 'El email ya está registrado.' });
-  
-  const newUser = {
-    id: users.length + 1,
-    email,
-    password, // En una app real, esto debería estar "hasheado" con bcrypt
-    data: { students: [], attendance: {} } // Cada usuario empieza con datos vacíos
-  };
-  users.push(newUser);
-  
-  console.log('Usuario registrado:', newUser);
-  res.status(201).json({ message: 'Usuario registrado con éxito.' });
+
+  try {
+    const existingUser = await usersCollection.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'El email ya está registrado.' });
+
+    // Encriptamos la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 es el "salt rounds"
+
+    const newUser = {
+      email,
+      password: hashedPassword,
+      data: { students: [], attendance: {} }
+    };
+    
+    await usersCollection.insertOne(newUser);
+    
+    console.log('Usuario registrado:', email);
+    res.status(201).json({ message: 'Usuario registrado con éxito.' });
+  } catch (error) {
+    console.error("Error en el registro:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
+  }
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ message: 'El email y la contraseña son requeridos.' });
 
-  const user = users.find(u => u.email === email);
-  if (!user || user.password !== password) return res.status(401).json({ message: 'Email o contraseña incorrectos.' });
+  try {
+    const user = await usersCollection.findOne({ email });
+    if (!user) return res.status(401).json({ message: 'Email o contraseña incorrectos.' });
 
-  // Si el login es correcto, creamos un token JWT
-  // El token contiene el ID del usuario, que nos servirá para identificarlo en futuras peticiones.
-  const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '8h' }); // El token expira en 8 horas
+    // Comparamos la contraseña enviada con la hasheada en la BD
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: 'Email o contraseña incorrectos.' });
 
-  res.json({ accessToken: accessToken }); // Enviamos el token al cliente
+    // Si el login es correcto, creamos un token JWT
+    const accessToken = jwt.sign({ id: user._id.toString() }, JWT_SECRET, { expiresIn: '8h' });
+
+    res.json({ accessToken: accessToken });
+  } catch (error) {
+    console.error("Error en el login:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
+  }
 });
 
 // --- Middleware de Autenticación ---
-// Esta función actuará como un "guardia de seguridad" para nuestras rutas.
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Formato: "Bearer TOKEN"
+  const token = authHeader && authHeader.split(' ')[1];
 
-  if (token == null) return res.sendStatus(401); // No hay token, no autorizado
+  if (token == null) return res.sendStatus(401);
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403); // El token no es válido o ha expirado
-    req.user = user; // Guardamos la información del usuario (el payload del token) en el objeto request
-    next(); // Si todo está bien, continuamos a la ruta solicitada
+  jwt.verify(token, JWT_SECRET, (err, decoded) => { // 'decoded' es el payload del token
+    if (err) return res.sendStatus(403);
+    req.userId = decoded.id; // Guardamos el ID del usuario en el objeto request
+    next();
   });
 }
 
 // --- Rutas de Datos (Protegidas) ---
 
-// Ruta para OBTENER los datos del usuario que ha iniciado sesión
-app.get('/api/data', authenticateToken, (req, res) => {
-  // Gracias al middleware, ahora tenemos req.user.id con el ID del usuario
-  const user = users.find(u => u.id === req.user.id);
-  if (!user) return res.status(404).send('Usuario no encontrado.');
+app.get('/api/data', authenticateToken, async (req, res) => {
+  try {
+    const user = await usersCollection.findOne({ _id: new ObjectId(req.userId) });
+    if (!user) return res.status(404).send('Usuario no encontrado.');
 
-  console.log(`Enviando datos para el usuario ${user.email}`);
-  res.json(user.data);
+    console.log(`Enviando datos para el usuario ${user.email}`);
+    res.json(user.data);
+  } catch (error) {
+    console.error("Error obteniendo datos:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
+  }
 });
 
-// Ruta para GUARDAR los datos del usuario que ha iniciado sesión
-app.post('/api/data', authenticateToken, (req, res) => {
-  const user = users.find(u => u.id === req.user.id);
-  if (!user) return res.status(404).send('Usuario no encontrado.');
+app.post('/api/data', authenticateToken, async (req, res) => {
+  try {
+    const result = await usersCollection.updateOne(
+      { _id: new ObjectId(req.userId) },
+      { $set: { data: req.body } }
+    );
 
-  // Reemplazamos los datos antiguos del usuario con los nuevos que vienen en el cuerpo de la petición
-  user.data = req.body;
-  console.log(`Datos guardados para el usuario ${user.email}`);
-  res.status(200).send('Datos guardados con éxito.');
+    if (result.matchedCount === 0) return res.status(404).send('Usuario no encontrado.');
+    
+    console.log(`Datos guardados para el usuario con ID ${req.userId}`);
+    res.status(200).send('Datos guardados con éxito.');
+  } catch (error) {
+    console.error("Error guardando datos:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
+  }
 });
 
 
-// 5. Iniciar el servidor
+// 5. Iniciar el servidor y conectar a la BD
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  connectDB();
 });

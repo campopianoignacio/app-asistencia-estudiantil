@@ -102,6 +102,7 @@
         let currentView = 'hoy';
         let currentDate = new Date();
         let displayedDate = new Date();
+        let selectedCourse = null; // Para guardar el curso seleccionado
 
         // ===================================================================================
         // AUTHENTICATION & DATA SYNC LOGIC
@@ -129,7 +130,7 @@
                 if (!appData.attendance) appData.attendance = {};
             } catch (error) {
                 console.error(error.message);
-                handleLogout(); // Si hay error con el token o datos, cerramos sesión
+                handleLogout();
             }
         }
 
@@ -157,9 +158,7 @@
             const toggleButton = document.getElementById(buttonId);
             const eyeIcon = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
             const eyeSlashedIcon = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 .946-3.11 3.563-5.534 6.88-6.461M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 2l20 20"></path></svg>`;
-
             toggleButton.innerHTML = eyeIcon;
-
             toggleButton.addEventListener('click', () => {
                 if (passwordInput.type === 'password') {
                     passwordInput.type = 'text';
@@ -177,10 +176,8 @@
             document.getElementById('show-register').addEventListener('click', (e) => { e.preventDefault(); toggleAuthView(false); });
             document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); toggleAuthView(true); });
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
-
             setupPasswordVisibilityToggle('login-password', 'toggle-login-password');
             setupPasswordVisibilityToggle('register-password', 'toggle-register-password');
-
             if (getAuthToken()) {
                 showApp();
             } else {
@@ -199,27 +196,14 @@
             const password = document.getElementById('login-password').value;
             const errorEl = document.getElementById('login-error');
             errorEl.textContent = '';
-
             try {
                 const response = await fetch(`${API_URL}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                const data = await response.json(); // Intenta procesar la respuesta como JSON
-
-                if (!response.ok) {
-                    // Si la respuesta no es exitosa (ej. 401, 400), usa el mensaje del JSON
-                    throw new Error(data.message || 'Error al iniciar sesión.');
-                }
-                
-                // Si todo fue bien, guarda el token y muestra la app
+                const data = await response.json();
+                if (!response.ok) { throw new Error(data.message || 'Error al iniciar sesión.'); }
                 setAuthToken(data.accessToken);
                 showApp();
             } catch (err) {
-                // Este bloque se activa si fetch falla, si response.json() falla, o si lanzamos el error manualmente
-                if (err instanceof SyntaxError) {
-                    // Esto ocurre si el servidor envía algo que no es JSON
-                    errorEl.textContent = "Error: Respuesta inválida del servidor.";
-                } else {
-                    errorEl.textContent = err.message;
-                }
+                errorEl.textContent = err instanceof SyntaxError ? "Error: Respuesta inválida del servidor." : err.message;
             }
         }
 
@@ -229,30 +213,20 @@
             const password = document.getElementById('register-password').value;
             const errorEl = document.getElementById('register-error');
             errorEl.textContent = '';
-
             try {
                 const response = await fetch(`${API_URL}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                const data = await response.json(); // Siempre esperamos una respuesta JSON
-
-                if (!response.ok) {
-                    // Si hay un error, usamos el mensaje del servidor
-                    throw new Error(data.message || 'Error al registrar la cuenta.');
-                }
-
+                const data = await response.json();
+                if (!response.ok) { throw new Error(data.message || 'Error al registrar la cuenta.'); }
                 alert(data.message || '¡Registro exitoso! Por favor, inicia sesión.');
                 toggleAuthView(true);
             } catch (err) {
-                if (err instanceof SyntaxError) {
-                    errorEl.textContent = "Error: Respuesta inválida del servidor.";
-                } else {
-                    errorEl.textContent = err.message;
-                }
+                errorEl.textContent = err instanceof SyntaxError ? "Error: Respuesta inválida del servidor." : err.message;
             }
         }
 
         function handleLogout() {
             removeAuthToken();
-            appData = { students: [], attendance: {} }; // Limpiar datos en memoria
+            appData = { students: [], attendance: {} };
             showAuth();
         }
 
@@ -264,7 +238,7 @@
         async function showApp() {
             authContainer.classList.add('hidden');
             appContainer.classList.remove('hidden');
-            await loadData(); // Cargar datos del servidor antes de inicializar la app
+            await loadData();
             initializeApp();
         }
 
@@ -273,12 +247,15 @@
         // ===================================================================================
         function initializeApp() {
             const navButtons = { hoy: document.getElementById('nav-hoy'), estudiantes: document.getElementById('nav-estudiantes'), agenda: document.getElementById('nav-agenda'), reportes: document.getElementById('nav-reportes'), configuracion: document.getElementById('nav-configuracion') };
-            navButtons.hoy.addEventListener('click', () => { displayedDate = new Date(); switchView('hoy'); });
+            navButtons.hoy.addEventListener('click', () => { 
+                displayedDate = new Date(); 
+                selectedCourse = null; // Reiniciar curso seleccionado
+                switchView('hoy'); 
+            });
             navButtons.estudiantes.addEventListener('click', () => switchView('estudiantes'));
             navButtons.agenda.addEventListener('click', () => switchView('agenda'));
             navButtons.reportes.addEventListener('click', () => switchView('reportes'));
             navButtons.configuracion.addEventListener('click', () => switchView('configuracion'));
-            
             loadInitialTheme();
             switchView('hoy');
         }
@@ -287,10 +264,8 @@
             currentView = viewName;
             const views = { hoy: document.getElementById('view-hoy'), estudiantes: document.getElementById('view-estudiantes'), agenda: document.getElementById('view-agenda'), reportes: document.getElementById('view-reportes'), configuracion: document.getElementById('view-configuracion') };
             Object.keys(views).forEach(key => views[key].classList.toggle('hidden', key !== viewName));
-            
             const titles = { hoy: `Asistencia: ${displayedDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`, estudiantes: 'Estudiantes', agenda: 'Agenda', reportes: 'Reporte de Ausencias', configuracion: 'Ajustes' };
             document.getElementById('header-title').textContent = titles[viewName];
-            
             const viewRenderers = { hoy: () => renderAttendanceList(toISODateString(displayedDate)), estudiantes: renderStudentManagementList, agenda: renderCalendar, reportes: renderReports, configuracion: renderConfigView };
             viewRenderers[viewName]();
         }
@@ -304,29 +279,92 @@
         // --- RENDER FUNCTIONS ---
         function renderAttendanceList(dateKey) {
             const container = document.getElementById('view-hoy');
-            container.innerHTML = `<div class="flex justify-between items-center mb-4"><div id="status-counter" class="text-sm text-gray-500 dark:text-gray-400 font-medium"></div><button id="mark-all-btn" class="px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-full shadow-lg hover:bg-blue-600 w-44">Marcar Todos</button></div><div id="student-list-hoy" class="space-y-2"></div>`;
-            const studentListEl = container.querySelector('#student-list-hoy');
-            if (!appData.students || appData.students.length === 0) {
-                studentListEl.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">Agrega estudiantes en la sección 'Estudiantes'.</p>`;
-                container.querySelector('#status-counter').textContent = '';
-                container.querySelector('#mark-all-btn').classList.add('hidden');
+            const courses = [...new Set((appData.students || []).map(s => s.course || 'Sin curso'))].sort();
+
+            if (!selectedCourse && courses.length > 1) {
+                container.innerHTML = `<h2 class="text-lg font-semibold mb-4 dark:text-gray-200">Selecciona un curso</h2><div id="course-selection-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>`;
+                const courseListEl = container.querySelector('#course-selection-list');
+                courses.forEach(course => {
+                    courseListEl.innerHTML += `<button class="course-select-btn w-full p-4 bg-white dark:bg-gray-800 rounded-lg shadow text-left font-semibold dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700" data-course="${course}">${course}</button>`;
+                });
+                container.querySelector('#course-selection-list').addEventListener('click', (e) => {
+                    const courseButton = e.target.closest('.course-select-btn');
+                    if (courseButton) {
+                        selectedCourse = courseButton.dataset.course;
+                        renderAttendanceList(dateKey);
+                    }
+                });
                 return;
             }
-            const attendanceRecord = appData.attendance[dateKey] || {};
-            appData.students.forEach(student => { const record = attendanceRecord[student.id] || { status: 'ausente', justified: false }; studentListEl.innerHTML += createAttendanceCardHTML(student, record); });
-            updateStatusAndCounter(dateKey);
-            container.querySelector('#student-list-hoy').addEventListener('click', handleAttendanceClick);
-            container.querySelector('#mark-all-btn').addEventListener('click', handleMarkAllClick);
+
+            if (!selectedCourse && courses.length === 1) {
+                selectedCourse = courses[0];
+            }
+
+            const studentsInCourse = selectedCourse ? (appData.students || []).filter(s => (s.course || 'Sin curso') === selectedCourse) : [];
+            studentsInCourse.sort((a, b) => a.name.localeCompare(b.name));
+
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <div id="status-counter" class="text-sm text-gray-500 dark:text-gray-400 font-medium"></div>
+                    ${studentsInCourse.length > 0 ? '<button id="mark-all-btn" class="px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-full shadow-lg hover:bg-blue-600 w-44">Marcar Todos</button>' : ''}
+                </div>
+                <div id="student-list-hoy" class="space-y-2"></div>
+                ${courses.length > 1 ? '<button id="change-course-btn" class="mt-6 text-sm text-blue-600 hover:underline">Cambiar de curso</button>' : ''}
+            `;
+
+            const studentListEl = container.querySelector('#student-list-hoy');
+            if (studentsInCourse.length === 0) {
+                studentListEl.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">No hay estudiantes ${selectedCourse ? `en el curso <strong>${selectedCourse}</strong>` : 'agregados'}.</p>`;
+                container.querySelector('#status-counter').textContent = '';
+            } else {
+                const attendanceRecord = appData.attendance[dateKey] || {};
+                studentsInCourse.forEach(student => {
+                    const record = attendanceRecord[student.id] || { status: 'ausente', justified: false };
+                    studentListEl.innerHTML += createAttendanceCardHTML(student, record);
+                });
+                updateStatusAndCounter(dateKey, studentsInCourse);
+                container.querySelector('#student-list-hoy').addEventListener('click', handleAttendanceClick);
+                container.querySelector('#mark-all-btn').addEventListener('click', (e) => handleMarkAllClick(e, studentsInCourse));
+            }
+
+            const changeCourseBtn = container.querySelector('#change-course-btn');
+            if (changeCourseBtn) {
+                changeCourseBtn.addEventListener('click', () => {
+                    selectedCourse = null;
+                    renderAttendanceList(dateKey);
+                });
+            }
         }
 
         function renderStudentManagementList() {
             const container = document.getElementById('view-estudiantes');
-            container.innerHTML = `<form id="add-student-form" class="mb-6 flex gap-2"><input type="text" id="student-name-input" placeholder="Nombre" class="flex-grow p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600" required><button type="submit" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg">Agregar</button></form><h2 class="text-lg font-semibold mb-2 dark:text-gray-200">Lista</h2><div id="student-list-gestion" class="space-y-2"></div>`;
+            container.innerHTML = `<form id="add-student-form" class="mb-6 flex flex-wrap gap-4 items-end"><div class="flex-grow"><label for="student-name-input" class="text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label><input type="text" id="student-name-input" placeholder="Nombre del Alumno" class="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600" required></div><div class="flex-grow"><label for="student-course-input" class="text-sm font-medium text-gray-700 dark:text-gray-300">Curso</label><input type="text" id="student-course-input" placeholder="Ej: 1ro A" class="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600" required></div><div><button type="submit" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg">Agregar</button></div></form><h2 class="text-lg font-semibold mb-2 dark:text-gray-200">Lista de Estudiantes</h2><div id="student-list-gestion" class="space-y-2"></div>`;
             const studentListGestionEl = container.querySelector('#student-list-gestion');
-            studentListGestionEl.innerHTML = !appData.students || appData.students.length === 0 ? `<p class="text-center text-gray-500 dark:text-gray-400">No hay estudiantes.</p>` : '';
-            if(appData.students) appData.students.forEach(student => { studentListGestionEl.innerHTML += `<div class="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-700"><div class="flex items-center"><img src="${student.avatarUrl}" alt="${student.name}" class="w-10 h-10 rounded-full mr-3"/><span class="font-medium dark:text-gray-200">${student.name}</span></div><button class="delete-student-btn text-red-500 hover:text-red-700" data-id="${student.id}">Eliminar</button></div>`; });
             container.querySelector('#add-student-form').addEventListener('submit', handleAddStudentSubmit);
             studentListGestionEl.addEventListener('click', handleDeleteStudentClick);
+
+            if (!appData.students || appData.students.length === 0) {
+                studentListGestionEl.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">No hay estudiantes.</p>`;
+                return;
+            }
+
+            appData.students.sort((a, b) => a.name.localeCompare(b.name));
+            const studentsByCourse = appData.students.reduce((acc, student) => {
+                const course = student.course || 'Sin curso';
+                if (!acc[course]) { acc[course] = []; }
+                acc[course].push(student);
+                return acc;
+            }, {});
+
+            studentListGestionEl.innerHTML = '';
+            const sortedCourses = Object.keys(studentsByCourse).sort();
+            for (const course of sortedCourses) {
+                studentListGestionEl.innerHTML += `<h3 class="text-md font-semibold text-gray-600 dark:text-gray-400 mt-4 mb-2">${course}</h3>`;
+                studentsByCourse[course].forEach(student => {
+                    studentListGestionEl.innerHTML += `<div class="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-700"><div class="flex items-center"><img src="${student.avatarUrl}" alt="${student.name}" class="w-10 h-10 rounded-full mr-3"/><span class="font-medium dark:text-gray-200">${student.name}</span></div><button class="delete-student-btn text-red-500 hover:text-red-700" data-id="${student.id}">Eliminar</button></div>`;
+                });
+            }
         }
 
         function renderCalendar() {
@@ -343,9 +381,14 @@
                 const loopDate = new Date(year, month, day); const dayOfWeek = loopDate.getDay();
                 if (dayOfWeek === 0 || dayOfWeek === 6) { calendarGridEl.innerHTML += `<div class="p-2 text-gray-400 dark:text-gray-600">${day}</div>`;
                 } else {
-                    const dateKey = toISODateString(loopDate); const attendanceRecord = appData.attendance ? appData.attendance[dateKey] : undefined;
+                    const dateKey = toISODateString(loopDate);
+                    const attendanceRecord = appData.attendance ? appData.attendance[dateKey] : undefined;
                     let cellClass = "p-2 rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-800";
-                    if (attendanceRecord && Object.keys(attendanceRecord).length > 0) { const presentCount = Object.values(attendanceRecord).filter(r => r.status === 'presente').length; if (appData.students && presentCount === appData.students.length && appData.students.length > 0) cellClass += " bg-green-200 dark:bg-green-800"; else cellClass += " bg-yellow-200 dark:bg-yellow-800"; }
+                    if (attendanceRecord && Object.keys(attendanceRecord).length > 0) {
+                        const presentCount = Object.values(attendanceRecord).filter(r => r.status === 'presente').length;
+                        if (appData.students && presentCount === appData.students.length && appData.students.length > 0) cellClass += " bg-green-200 dark:bg-green-800";
+                        else cellClass += " bg-yellow-200 dark:bg-yellow-800";
+                    }
                     calendarGridEl.innerHTML += `<div class="${cellClass}" data-date="${dateKey}">${day}</div>`;
                 }
             }
@@ -378,14 +421,97 @@
         const getInitials = (name) => { if (!name) return '??'; const words = name.trim().split(/\s+/); return words.length > 1 ? (words[0][0] + words[words.length - 1][0]).toUpperCase() : (words[0] ? words[0].substring(0, 2).toUpperCase() : '??'); };
         const toISODateString = (date) => date.toISOString().split('T')[0];
         function createAttendanceCardHTML(student, record) { const isPresent = record.status === 'presente'; const isJustified = record.justified; let statusText = isPresent ? 'Presente' : 'Ausente'; if (!isPresent && isJustified) statusText += ' (J)'; const cardClasses = isPresent ? 'bg-green-50 dark:bg-green-900/50' : (isJustified ? 'bg-yellow-50 dark:bg-yellow-900/50' : 'bg-red-50 dark:bg-red-900/50'); const statusBadgeColor = isPresent ? 'bg-green-500' : (isJustified ? 'bg-yellow-500' : 'bg-red-500'); const justifyButton = !isPresent && !isJustified ? `<button class="justify-btn text-xs py-1 px-2 rounded-md bg-gray-200 dark:bg-gray-600">Justificar</button>` : ''; return `<div class="flex items-center justify-between p-4 rounded-xl border dark:border-gray-700 shadow-sm cursor-pointer ${cardClasses}" data-id="${student.id}"><div class="flex items-center pointer-events-none"><img src="${student.avatarUrl}" alt="${student.name}" class="w-12 h-12 rounded-full mr-4"/><span class="font-semibold dark:text-gray-200">${student.name}</span></div><div class="flex items-center space-x-3"><span class="text-xs font-bold px-2 py-1 rounded-full text-white ${statusBadgeColor}">${statusText}</span>${justifyButton}</div></div>`; }
-        function updateStatusAndCounter(dateKey) { const container = document.getElementById('view-hoy'); const statusCounterEl = container.querySelector('#status-counter'); const attendanceRecord = appData.attendance ? appData.attendance[dateKey] || {} : {}; const presentCount = appData.students ? appData.students.filter(s => (attendanceRecord[s.id] ? attendanceRecord[s.id].status : 'ausente') === 'presente').length : 0; const totalStudents = appData.students ? appData.students.length : 0; statusCounterEl.textContent = `${presentCount} / ${totalStudents} Presentes`; container.querySelector('#mark-all-btn').textContent = presentCount === totalStudents ? 'Marcar Ausentes' : 'Marcar Presentes'; }
+        
+        function updateStatusAndCounter(dateKey, students) {
+            const container = document.getElementById('view-hoy');
+            if (!container) return;
+            const statusCounterEl = container.querySelector('#status-counter');
+            const markAllBtn = container.querySelector('#mark-all-btn');
+            if (!statusCounterEl) return;
+
+            const attendanceRecord = appData.attendance ? appData.attendance[dateKey] || {} : {};
+            const presentCount = students.filter(s => (attendanceRecord[s.id] ? attendanceRecord[s.id].status : 'ausente') === 'presente').length;
+            const totalStudents = students.length;
+            
+            statusCounterEl.textContent = `${presentCount} / ${totalStudents} Presentes`;
+            if(markAllBtn) markAllBtn.textContent = presentCount === totalStudents ? 'Marcar Ausentes' : 'Marcar Presentes';
+        }
 
         // --- EVENT HANDLERS for main app ---
-        async function handleAttendanceClick(e) { const cardEl = e.target.closest('[data-id]'); if (!cardEl) return; const studentId = cardEl.dataset.id; const dateKey = toISODateString(displayedDate); if (!appData.attendance[dateKey]) appData.attendance[dateKey] = {}; if (!appData.attendance[dateKey][studentId]) appData.attendance[dateKey][studentId] = { status: 'ausente', justified: false }; if (e.target.classList.contains('justify-btn')) { appData.attendance[dateKey][studentId].justified = true; } else { const currentStatus = appData.attendance[dateKey][studentId].status; appData.attendance[dateKey][studentId].status = currentStatus === 'presente' ? 'ausente' : 'presente'; } await saveData(); renderAttendanceList(dateKey); }
-        async function handleMarkAllClick() { const dateKey = toISODateString(displayedDate); if (!appData.attendance[dateKey]) appData.attendance[dateKey] = {}; const allPresent = appData.students && appData.students.every(s => appData.attendance[dateKey][s.id] && appData.attendance[dateKey][s.id].status === 'presente'); const newStatus = allPresent ? 'ausente' : 'presente'; if(appData.students) appData.students.forEach(s => { appData.attendance[dateKey][s.id] = { status: newStatus, justified: false }; }); await saveData(); renderAttendanceList(dateKey); }
-        async function handleAddStudentSubmit(e) { e.preventDefault(); const studentNameInput = document.getElementById('view-estudiantes').querySelector('#student-name-input'); const studentName = studentNameInput.value.trim(); if (studentName) { const newStudent = { id: `s_${Date.now()}`, name: studentName, avatarUrl: `https://placehold.co/100x100/d1d5db/ffffff?text=${getInitials(studentName)}` }; if(!appData.students) appData.students = []; appData.students.push(newStudent); await saveData(); renderStudentManagementList(); studentNameInput.value = ''; } }
-        async function handleDeleteStudentClick(e) { if (e.target.classList.contains('delete-student-btn')) { const studentId = e.target.dataset.id; if (confirm('¿Seguro que quieres eliminar este estudiante?')) { if(appData.students) appData.students = appData.students.filter(s => s.id !== studentId); if(appData.attendance) Object.keys(appData.attendance).forEach(dateKey => { delete appData.attendance[dateKey][studentId]; }); await saveData(); renderStudentManagementList(); } } }
-        function handleCalendarClick(e) { if (e.target.dataset.date) { const [year, month, day] = e.target.dataset.date.split('-').map(Number); displayedDate = new Date(year, month - 1, day); switchView('hoy'); } }
+        async function handleAttendanceClick(e) {
+            const cardEl = e.target.closest('[data-id]');
+            if (!cardEl) return;
+            const studentId = cardEl.dataset.id;
+            const dateKey = toISODateString(displayedDate);
+            if (!appData.attendance[dateKey]) appData.attendance[dateKey] = {};
+            if (!appData.attendance[dateKey][studentId]) appData.attendance[dateKey][studentId] = { status: 'ausente', justified: false };
+            if (e.target.classList.contains('justify-btn')) {
+                appData.attendance[dateKey][studentId].justified = true;
+            } else {
+                const currentStatus = appData.attendance[dateKey][studentId].status;
+                appData.attendance[dateKey][studentId].status = currentStatus === 'presente' ? 'ausente' : 'presente';
+            }
+            await saveData();
+            renderAttendanceList(dateKey);
+        }
+
+        async function handleMarkAllClick(e, students) {
+            const dateKey = toISODateString(displayedDate);
+            if (!appData.attendance[dateKey]) appData.attendance[dateKey] = {};
+            const allPresent = students.every(s => appData.attendance[dateKey][s.id] && appData.attendance[dateKey][s.id].status === 'presente');
+            const newStatus = allPresent ? 'ausente' : 'presente';
+            students.forEach(s => {
+                if (!appData.attendance[dateKey][s.id]) {
+                    appData.attendance[dateKey][s.id] = { status: 'ausente', justified: false };
+                }
+                appData.attendance[dateKey][s.id].status = newStatus;
+            });
+            await saveData();
+            renderAttendanceList(dateKey);
+        }
+
+        async function handleAddStudentSubmit(e) {
+            e.preventDefault();
+            const studentNameInput = document.getElementById('student-name-input');
+            const studentCourseInput = document.getElementById('student-course-input');
+            const studentName = studentNameInput.value.trim();
+            const studentCourse = studentCourseInput.value.trim();
+            if (studentName && studentCourse) {
+                const newStudent = {
+                    id: `s_${Date.now()}`,
+                    name: studentName,
+                    course: studentCourse,
+                    avatarUrl: `https://placehold.co/100x100/d1d5db/ffffff?text=${getInitials(studentName)}`
+                };
+                if (!appData.students) appData.students = [];
+                appData.students.push(newStudent);
+                await saveData();
+                renderStudentManagementList();
+                studentNameInput.value = '';
+                studentCourseInput.value = '';
+            }
+        }
+
+        async function handleDeleteStudentClick(e) {
+            if (e.target.classList.contains('delete-student-btn')) {
+                const studentId = e.target.dataset.id;
+                if (confirm('¿Seguro que quieres eliminar este estudiante?')) {
+                    if(appData.students) appData.students = appData.students.filter(s => s.id !== studentId);
+                    if(appData.attendance) Object.keys(appData.attendance).forEach(dateKey => { delete appData.attendance[dateKey][studentId]; });
+                    await saveData();
+                    renderStudentManagementList();
+                }
+            }
+        }
+
+        function handleCalendarClick(e) {
+            if (e.target.dataset.date) {
+                const [year, month, day] = e.target.dataset.date.split('-').map(Number);
+                displayedDate = new Date(year, month - 1, day);
+                selectedCourse = null; // Reiniciar curso al cambiar de día
+                switchView('hoy');
+            }
+        }
 
         // --- INITIALIZE APP ---
         initAuth();

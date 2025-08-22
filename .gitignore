@@ -1,3 +1,6 @@
 # Firebase
 .firebase/
 firebase-debug.log
+
+# Node
+/asistencia-fullstack/backend/node_modules
