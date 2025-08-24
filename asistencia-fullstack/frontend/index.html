@@ -213,6 +213,15 @@
             const password = document.getElementById('register-password').value;
             const errorEl = document.getElementById('register-error');
             errorEl.textContent = '';
+
+            // --- Validación de Contraseña ---
+            const hasSpecialChars = /[^a-zA-Z0-9]/.test(password);
+            if (hasSpecialChars) {
+                errorEl.textContent = 'La contraseña solo puede contener letras y números.';
+                return; // Detener la ejecución si la contraseña no es válida
+            }
+            // --- Fin de Validación ---
+
             try {
                 const response = await fetch(`${API_URL}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await response.json();
