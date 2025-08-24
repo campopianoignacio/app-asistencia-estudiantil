@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'una-clave-secreta-muy-dificil-de-adivinar'; // En una app real, esto debería estar en una variable de entorno.
 
 // --- Conexión a la Base de Datos ---
-const MONGO_URI = "mongodb+srv://campopianoignacio:db_a2e3YivyVBn.h#j@cluster0.ak3l55y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = "mongodb+srv://campopianoignacio:db_a2e3YivyVBn.h%23j@cluster0.ak3l55y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const client = new MongoClient(MONGO_URI);
 
 let db;
