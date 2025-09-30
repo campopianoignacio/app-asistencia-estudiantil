@@ -6,88 +6,379 @@
     <title>Asistencia Estudiantil</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' };
     </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        .glass-header, .glass-nav { background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        .dark .glass-header, .dark .glass-nav { background-color: rgba(17, 24, 39, 0.85); }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
-        .animate-subtle-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        .nav-btn-active { color: #3b82f6; }
-        .dark .nav-btn-active { color: #60a5fa; }
-        .toggle-checkbox:checked { right: 0; border-color: #3b82f6; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #3b82f6; }
+        <style>
+        :root {
+            --bg-light: #ffffff;
+            --bg-soft-green: #E8F5E9;
+            --text-light: #000000;
+            --accent-green: #4CAF50;
+            --gray-light: #f0f0f0; /* Lighter gray for borders */
+
+            --bg-dark: #121212;
+            --bg-dark-green: #1B5E20;
+            --text-dark: #ffffff;
+            --accent-green-dark: #66BB6A;
+            --gray-dark: #2a2a2a; /* Slightly lighter dark gray */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif; /* New font */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        .dark body {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            padding: 16px 32px; /* Increased padding */
+            border-bottom: 1px solid var(--gray-light);
+            background-color: var(--bg-light);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .dark .header {
+            border-bottom-color: var(--gray-dark);
+            background-color: var(--bg-dark);
+        }
+
+        #header-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 32px;
+            padding-bottom: 120px; /* Space for floating nav bar */
+        }
+
+        /* Floating Nav Bar */
+        .nav-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            padding: 10px 0;
+            border-radius: 24px;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(230, 230, 230, 0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, border-color 0.3s;
+            z-index: 100;
+        }
+
+        .dark .nav-bar {
+            background-color: rgba(30, 30, 30, 0.7);
+            border-color: rgba(60, 60, 60, 0.5);
+        }
+
+        .nav-btn {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.25s ease-in-out, transform 0.25s ease-in-out;
+            padding: 4px 0; /* Let grid handle horizontal space */
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.nav-btn-active {
+            color: var(--accent-green);
+        }
+
+        .dark .nav-btn.nav-btn-active {
+            color: var(--accent-green-dark);
+        }
+
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 1.5;
+            margin: 0 auto; /* Center icon in grid cell */
+        }
+
+        .nav-btn span {
+            font-size: 9px;
+            margin-top: 4px;
+        }
+
+        /* Modern Inputs and Buttons */
+        .input-styled {
+            width: 100%;
+            padding: 14px; /* Increased padding */
+            border: 1px solid var(--gray-light);
+            border-radius: 14px; /* Softer radius */
+            background-color: var(--bg-soft-green);
+            transition: all 0.2s ease-in-out;
+        }
+        .dark .input-styled {
+            background-color: var(--gray-dark);
+            border-color: var(--gray-dark);
+            color: var(--text-dark);
+        }
+        .input-styled:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.2); /* Softer shadow */
+        }
+        .dark .input-styled:focus {
+            box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.3);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px; /* Increased padding */
+            background-color: var(--accent-green);
+            color: white;
+            font-weight: 600;
+            border-radius: 14px; /* Softer radius */
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .dark .btn-primary {
+             background-color: var(--accent-green-dark);
+             color: var(--bg-dark);
+        }
+
+        .btn-primary:hover {
+            background-color: #388E3C;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .dark .btn-primary:hover {
+            background-color: #81C784;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:active { /* Press effect */
+            transform: translateY(0px) scale(0.98);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Modern Cards */
+        .course-card, .course-card-report, .student-card-report, #student-list-gestion > div, #course-list-gestion > div, div[data-id^="s_"] {
+            border-radius: 16px; /* Softer radius */
+            transition: all 0.25s ease-out;
+        }
+        .course-card:hover, .course-card-report:hover, .student-card-report:hover, #student-list-gestion > div:hover, #course-list-gestion > div:hover, div[data-id^="s_"]:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+        }
+        .dark .course-card:hover, .dark .course-card-report:hover, .dark .student-card-report:hover, .dark #student-list-gestion > div:hover, .dark #course-list-gestion > div:hover, .dark div[data-id^="s_"]:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Centered Agenda */
+        #agenda-container-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        #calendar-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--bg-light);
+            padding: 24px; /* Increased padding */
+            border-radius: 24px; /* Softer radius */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .dark #calendar-container {
+            background-color: #000; /* Black background */
+            border: 1px solid var(--gray-dark);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        #calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px; /* Increased gap */
+            text-align: center;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        main > div:not(.hidden) {
+            animation: slideIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .auth-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .auth-fade-out {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+
+        #auth-container > div {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .list-item-animate {
+            opacity: 0; /* Start hidden */
+            animation: popIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-delay: calc(var(--stagger-index) * 50ms);
+        }
+
+        @keyframes slideUpNav {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-bar-animate {
+            animation: slideUpNav 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-delay: 0.3s; /* Delay after main view animates */
+        }
+
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+<body class="bg-gray-100 dark:bg-gray-900">
 
     <!-- Container for Authentication (Login/Register) -->
     <div id="auth-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-4">
-            <div id="login-view" class="w-full max-w-sm">
-                <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-gray-200 mb-6">Iniciar Sesión</h1>
+            <div id="login-view" class="w-full max-w-sm space-y-4">
+                <img src="images/62c96a14-c165-46bc-affd-dc344583c315.png" alt="Logo" class="mx-auto h-32 w-auto mb-6" />
+                <h1 class="text-3xl font-bold text-center">Iniciar Sesión</h1>
                 <form id="login-form" class="space-y-4">
-                    <input type="email" id="login-email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200" required>
+                    <input type="email" id="login-email" placeholder="Email" class="input-styled" required>
                     <div class="relative">
-                        <input type="password" id="login-password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 pr-10" required>
-                        <button type="button" id="toggle-login-password" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        </button>
+                        <input type="password" id="login-password" placeholder="Contraseña" class="input-styled pr-10" required>
+                        <button type="button" id="toggle-login-password" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"></button>
                     </div>
-                    <button type="submit" class="w-full p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">Entrar</button>
+                    <button type="submit" class="btn-primary">Entrar</button>
                 </form>
-                <p id="login-error" class="text-red-500 text-sm text-center mt-4"></p>
-                <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">¿No tienes cuenta? <a href="#" id="show-register" class="font-medium text-blue-600 hover:underline">Regístrate</a></p>
+                <p id="login-error" class="text-red-500 text-sm text-center"></p>
+                <p class="text-center text-sm">¿No tienes cuenta? <a href="#" id="show-register" class="font-medium text-[var(--accent-green)] hover:underline">Regístrate</a></p>
             </div>
-            <div id="register-view" class="w-full max-w-sm hidden">
-                <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-gray-200 mb-6">Crear Cuenta</h1>
+            <div id="register-view" class="w-full max-w-sm space-y-4 hidden">
+                <img src="images/62c96a14-c165-46bc-affd-dc344583c315.png" alt="Logo" class="mx-auto h-32 w-auto mb-6" />
+                <h1 class="text-3xl font-bold text-center">Crear Cuenta</h1>
                 <form id="register-form" class="space-y-4">
-                    <input type="email" id="register-email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200" required>
+                    <input type="email" id="register-email" placeholder="Email" class="input-styled" required>
                     <div class="relative">
-                        <input type="password" id="register-password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 pr-10" required>
-                        <button type="button" id="toggle-register-password" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        </button>
+                        <input type="password" id="register-password" placeholder="Contraseña" class="input-styled pr-10" required>
+                        <button type="button" id="toggle-register-password" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"></button>
                     </div>
-                    <button type="submit" class="w-full p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">Registrar</button>
+                    <button type="submit" class="btn-primary">Registrar</button>
                 </form>
-                <p id="register-error" class="text-red-500 text-sm text-center mt-4"></p>
-                <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">¿Ya tienes cuenta? <a href="#" id="show-login" class="font-medium text-blue-600 hover:underline">Inicia Sesión</a></p>
+                <p id="register-error" class="text-red-500 text-sm text-center"></p>
+                <p class="text-center text-sm">¿Ya tienes cuenta? <a href="#" id="show-login" class="font-medium text-[var(--accent-green)] hover:underline">Inicia Sesión</a></p>
             </div>
         </div>
     </div>
 
     <!-- Container for the main application (hidden by default) -->
-    <div id="app-container" class="hidden">
-        <header class="sticky top-0 z-50 flex items-center justify-between p-4 glass-header border-b border-gray-200 dark:border-gray-700">
-            <h1 id="header-title" class="text-lg font-bold text-gray-800 dark:text-gray-200"></h1>
+    <div id="app-container" class="main-container hidden">
+        <header class="header flex justify-between items-center">
+            <h1 id="header-title">Hoy</h1>
             <button id="logout-btn" class="text-sm font-medium text-red-500 hover:text-red-700 dark:hover:text-red-400">Salir</button>
         </header>
-        <main class="p-4 pb-24">
+
+        <main>
             <div id="view-hoy"></div>
             <div id="view-estudiantes" class="hidden"></div>
+            <div id="view-cursos" class="hidden"></div>
             <div id="view-agenda" class="hidden"></div>
             <div id="view-reportes" class="hidden"></div>
             <div id="view-configuracion" class="hidden"></div>
         </main>
-        <nav class="fixed bottom-0 left-0 right-0 glass-nav border-t border-gray-200 dark:border-gray-700 z-50">
-            <div class="flex justify-around py-2">
-                <button id="nav-hoy" class="nav-btn flex flex-col items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" y2="6"/><line x1="8" y1="2" y2="6"/><line x1="3" y1="10" y2="21"/></svg><span class="text-xs mt-1 font-medium">Hoy</span></button>
-                <button id="nav-estudiantes" class="nav-btn flex flex-col items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="text-xs mt-1 font-medium">Estudiantes</span></button>
-                <button id="nav-agenda" class="nav-btn flex flex-col items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" y2="6"/><line x1="8" y1="2" y2="6"/><line x1="3" y1="10" y2="10"/></svg><span class="text-xs mt-1 font-medium">Agenda</span></button>
-                <button id="nav-reportes" class="nav-btn flex flex-col items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8a6 6 0 0 0-6-6h-1.7"/><path d="M13 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg><span class="text-xs mt-1 font-medium">Reportes</span></button>
-                <button id="nav-configuracion" class="nav-btn flex flex-col items-center w-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.26.43a2 2 0 0 0 .01 2.73l.08.15a2 2 0 0 1 0 2v.44a2 2 0 0 1 0 2l-.08.15a2 2 0 0 0 .01 2.73l.26.43a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.26-.43a2 2 0 0 0 .01-2.73l-.08-.15a2 2 0 0 1 0-2v-.44a2 2 0 0 1 0-2l.08-.15a2 2 0 0 0-.01-2.73l-.26-.43a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span class="text-xs mt-1 font-medium">Ajustes</span></button>
-            </div>
+
+        <nav class="nav-bar">
+            <button id="nav-hoy" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" y2="6"/><line x1="8" y1="2" y2="6"/></svg>
+                <span>Hoy</span>
+            </button>
+            <button id="nav-estudiantes" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Estudiantes</span>
+            </button>
+            <button id="nav-cursos" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>
+                <span>Cursos</span>
+            </button>
+            <button id="nav-agenda" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" y2="6"/><line x1="8" y1="2" y2="6"/><line x1="3" y1="10" y2="10"/></svg>
+                <span>Agenda</span>
+            </button>
+            <button id="nav-reportes" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M18.7 8a6 6 0 0 0-6-6h-1.7"/><path d="M13 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
+                <span>Reportes</span>
+            </button>
+            <button id="nav-configuracion" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.26.43a2 2 0 0 0 .01 2.73l.08.15a2 2 0 0 1 0 2v.44a2 2 0 0 1 0 2l-.08.15a2 2 0 0 0 .01 2.73l.26.43a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l-.26-.43a2 2 0 0 0 .01-2.73l-.08-.15a2 2 0 0 1 0-2v-.44a2 2 0 0 1 0-2l.08-.15a2 2 0 0 0-.01-2.73l-.26-.43a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Ajustes</span>
+            </button>
         </nav>
     </div>
-    
+
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- CONFIGURATION ---
         const API_URL = 'https://app-asistencia-backend.onrender.com';
         const TOKEN_KEY = 'attendanceAppToken';
 
@@ -96,13 +387,34 @@
         const appContainer = document.getElementById('app-container');
         const loginView = document.getElementById('login-view');
         const registerView = document.getElementById('register-view');
+        const headerTitle = document.getElementById('header-title');
+
+        const views = { 
+            hoy: document.getElementById('view-hoy'), 
+            estudiantes: document.getElementById('view-estudiantes'), 
+            cursos: document.getElementById('view-cursos'), 
+            agenda: document.getElementById('view-agenda'), 
+            reportes: document.getElementById('view-reportes'), 
+            configuracion: document.getElementById('view-configuracion') 
+        };
+        const navButtons = { 
+            hoy: document.getElementById('nav-hoy'), 
+            estudiantes: document.getElementById('nav-estudiantes'), 
+            cursos: document.getElementById('nav-cursos'), 
+            agenda: document.getElementById('nav-agenda'), 
+            reportes: document.getElementById('nav-reportes'), 
+            configuracion: document.getElementById('nav-configuracion') 
+        };
 
         // --- APP STATE ---
-        let appData = { students: [], attendance: {} };
+        let appData = { students: [], attendance: {}, courses: [] };
         let currentView = 'hoy';
-        let currentDate = new Date();
         let displayedDate = new Date();
-        let selectedCourse = null; // Para guardar el curso seleccionado
+        let currentDate = new Date();
+        let selectedCourseIdForAttendance = null;
+        let selectedCourseIdForReports = null;
+        let selectedStudentIdForReport = null;
+        let selectedDateForAgenda = null;
 
         // ===================================================================================
         // AUTHENTICATION & DATA SYNC LOGIC
@@ -125,9 +437,11 @@
                 if (!response.ok) {
                     throw new Error('Error al cargar los datos del servidor.');
                 }
-                appData = await response.json();
+                const data = await response.json();
+                appData = data;
                 if (!appData.students) appData.students = [];
                 if (!appData.attendance) appData.attendance = {};
+                if (!appData.courses) appData.courses = [];
             } catch (error) {
                 console.error(error.message);
                 handleLogout();
@@ -186,8 +500,27 @@
         }
 
         function toggleAuthView(showLogin) {
-            loginView.classList.toggle('hidden', !showLogin);
-            registerView.classList.toggle('hidden', showLogin);
+            const viewToShow = showLogin ? loginView : registerView;
+            const viewToHide = showLogin ? registerView : loginView;
+
+            if (!viewToShow.classList.contains('hidden')) {
+                return;
+            }
+
+            viewToHide.classList.add('auth-fade-out');
+
+            viewToHide.addEventListener('animationend', () => {
+                viewToHide.classList.add('hidden');
+                viewToHide.classList.remove('auth-fade-out');
+
+                viewToShow.classList.remove('hidden');
+                viewToShow.classList.add('auth-fade-in');
+                
+                viewToShow.addEventListener('animationend', () => {
+                    viewToShow.classList.remove('auth-fade-in');
+                }, { once: true });
+
+            }, { once: true });
         }
 
         async function handleLogin(e) {
@@ -213,15 +546,11 @@
             const password = document.getElementById('register-password').value;
             const errorEl = document.getElementById('register-error');
             errorEl.textContent = '';
-
-            // --- Validación de Contraseña ---
             const hasSpecialChars = /[^a-zA-Z0-9]/.test(password);
             if (hasSpecialChars) {
                 errorEl.textContent = 'La contraseña solo puede contener letras y números.';
-                return; // Detener la ejecución si la contraseña no es válida
+                return;
             }
-            // --- Fin de Validación ---
-
             try {
                 const response = await fetch(`${API_URL}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await response.json();
@@ -235,7 +564,8 @@
 
         function handleLogout() {
             removeAuthToken();
-            appData = { students: [], attendance: {} };
+            appData = { students: [], attendance: {}, courses: [] };
+            document.querySelector('.nav-bar').classList.remove('nav-bar-animate');
             showAuth();
         }
 
@@ -247,6 +577,7 @@
         async function showApp() {
             authContainer.classList.add('hidden');
             appContainer.classList.remove('hidden');
+            document.querySelector('.nav-bar').classList.add('nav-bar-animate');
             await loadData();
             initializeApp();
         }
@@ -254,206 +585,571 @@
         // ===================================================================================
         // MAIN APPLICATION LOGIC
         // ===================================================================================
-        function initializeApp() {
-            const navButtons = { hoy: document.getElementById('nav-hoy'), estudiantes: document.getElementById('nav-estudiantes'), agenda: document.getElementById('nav-agenda'), reportes: document.getElementById('nav-reportes'), configuracion: document.getElementById('nav-configuracion') };
-            navButtons.hoy.addEventListener('click', () => { 
-                displayedDate = new Date(); 
-                selectedCourse = null; // Reiniciar curso seleccionado
-                switchView('hoy'); 
-            });
-            navButtons.estudiantes.addEventListener('click', () => switchView('estudiantes'));
-            navButtons.agenda.addEventListener('click', () => switchView('agenda'));
-            navButtons.reportes.addEventListener('click', () => switchView('reportes'));
-            navButtons.configuracion.addEventListener('click', () => switchView('configuracion'));
-            loadInitialTheme();
-            switchView('hoy');
+        
+        // --- UTILITY FUNCTIONS ---
+        const getInitials = (name) => {
+            if (!name) return '??';
+            const words = name.trim().split(/\s+/);
+            return words.length > 1 ? (words[0][0] + words[words.length - 1][0]).toUpperCase() : (words[0] ? words[0].substring(0, 2).toUpperCase() : '??');
+        };
+        const toISODateString = (date) => date.toISOString().split('T')[0];
+        const getCourseName = (courseId) => {
+            const course = appData.courses.find(c => c.id === courseId);
+            return course ? course.name : 'Sin Curso';
+        };
+
+        function animateListItems(containerSelector) {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+            const items = container.children;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                item.style.setProperty('--stagger-index', i);
+                item.classList.add('list-item-animate');
+            }
         }
 
+        // --- VIEW ROUTING & RENDERING ---
         function switchView(viewName) {
+            if (viewName !== 'agenda') {
+                selectedDateForAgenda = null;
+                selectedCourseIdForAttendance = null;
+            }
+            if (viewName !== 'hoy') {
+                selectedCourseIdForAttendance = null;
+            }
+            if (viewName !== 'reportes') {
+                selectedCourseIdForReports = null;
+                selectedStudentIdForReport = null;
+            }
             currentView = viewName;
-            const views = { hoy: document.getElementById('view-hoy'), estudiantes: document.getElementById('view-estudiantes'), agenda: document.getElementById('view-agenda'), reportes: document.getElementById('view-reportes'), configuracion: document.getElementById('view-configuracion') };
             Object.keys(views).forEach(key => views[key].classList.toggle('hidden', key !== viewName));
-            const titles = { hoy: `Asistencia: ${displayedDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`, estudiantes: 'Estudiantes', agenda: 'Agenda', reportes: 'Reporte de Ausencias', configuracion: 'Ajustes' };
-            document.getElementById('header-title').textContent = titles[viewName];
-            const viewRenderers = { hoy: () => renderAttendanceList(toISODateString(displayedDate)), estudiantes: renderStudentManagementList, agenda: renderCalendar, reportes: renderReports, configuracion: renderConfigView };
+            Object.keys(navButtons).forEach(key => {
+                navButtons[key].classList.toggle('nav-btn-active', key === viewName);
+            });
+            
+            const titles = { hoy: `Asistencia`, estudiantes: 'Estudiantes', cursos: 'Cursos', agenda: 'Agenda', reportes: 'Reportes', configuracion: 'Ajustes' };
+            headerTitle.textContent = titles[viewName];
+            if (viewName === 'hoy') {
+                headerTitle.textContent = displayedDate.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' });
+            }
+            
+            const viewRenderers = { hoy: () => renderAttendanceList(toISODateString(displayedDate)), estudiantes: renderStudentManagementList, cursos: renderCourseManagementList, agenda: renderCalendar, reportes: renderReports, configuracion: renderConfigView };
             viewRenderers[viewName]();
         }
 
-        // --- THEME MANAGEMENT ---
-        const THEME_KEY = 'theme';
-        function applyTheme(theme) { document.documentElement.classList.toggle('dark', theme === 'dark'); const themeToggle = document.getElementById('theme-toggle-checkbox'); if (themeToggle) themeToggle.checked = theme === 'dark'; }
-        function toggleTheme() { const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark'; localStorage.setItem(THEME_KEY, newTheme); applyTheme(newTheme); }
-        function loadInitialTheme() { const savedTheme = localStorage.getItem(THEME_KEY); const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; applyTheme(savedTheme || (systemPrefersDark ? 'dark' : 'light')); }
-
         // --- RENDER FUNCTIONS ---
         function renderAttendanceList(dateKey) {
-            const container = document.getElementById('view-hoy');
-            const courses = [...new Set((appData.students || []).map(s => s.course || 'Sin curso'))].sort();
+            const container = views.hoy;
 
-            if (!selectedCourse && courses.length > 1) {
-                container.innerHTML = `<h2 class="text-lg font-semibold mb-4 dark:text-gray-200">Selecciona un curso</h2><div id="course-selection-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>`;
-                const courseListEl = container.querySelector('#course-selection-list');
-                courses.forEach(course => {
-                    courseListEl.innerHTML += `<button class="course-select-btn w-full p-4 bg-white dark:bg-gray-800 rounded-lg shadow text-left font-semibold dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700" data-course="${course}">${course}</button>`;
+            if (!selectedCourseIdForAttendance) {
+                container.innerHTML = `<div id="course-selection-hoy" class="space-y-3"></div>`;
+                const courseListEl = container.querySelector('#course-selection-hoy');
+                if (appData.courses.length === 0) {
+                    courseListEl.innerHTML = `<p class="text-center mt-10">No hay cursos definidos. Ve a la pestaña 'Cursos' para agregar uno.</p>`;
+                    return;
+                }
+
+                let courseSelectionHTML = '<h2 class="text-xl font-bold mb-4 text-center">Selecciona un Curso</h2>';
+                appData.courses.forEach(course => {
+                    courseSelectionHTML += `
+                        <div class="course-card p-4 rounded-xl bg-[var(--bg-soft-green)] dark:bg-[var(--gray-dark)] hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer text-center" data-course-id="${course.id}">
+                            <h3 class="font-bold text-lg pointer-events-none">${course.name}</h3>
+                        </div>
+                    `;
                 });
-                container.querySelector('#course-selection-list').addEventListener('click', (e) => {
-                    const courseButton = e.target.closest('.course-select-btn');
-                    if (courseButton) {
-                        selectedCourse = courseButton.dataset.course;
+                courseListEl.innerHTML = courseSelectionHTML;
+                animateListItems('#course-selection-hoy');
+
+                courseListEl.addEventListener('click', (e) => {
+                    const card = e.target.closest('.course-card');
+                    if (card) {
+                        selectedCourseIdForAttendance = card.dataset.courseId;
                         renderAttendanceList(dateKey);
                     }
                 });
-                return;
-            }
-
-            if (!selectedCourse && courses.length === 1) {
-                selectedCourse = courses[0];
-            }
-
-            const studentsInCourse = selectedCourse ? (appData.students || []).filter(s => (s.course || 'Sin curso') === selectedCourse) : [];
-            studentsInCourse.sort((a, b) => a.name.localeCompare(b.name));
-
-            container.innerHTML = `
-                <div class="flex justify-between items-center mb-4">
-                    <div id="status-counter" class="text-sm text-gray-500 dark:text-gray-400 font-medium"></div>
-                    ${studentsInCourse.length > 0 ? '<button id="mark-all-btn" class="px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-full shadow-lg hover:bg-blue-600 w-44">Marcar Todos</button>' : ''}
-                </div>
-                <div id="student-list-hoy" class="space-y-2"></div>
-                ${courses.length > 1 ? '<button id="change-course-btn" class="mt-6 text-sm text-blue-600 hover:underline">Cambiar de curso</button>' : ''}
-            `;
-
-            const studentListEl = container.querySelector('#student-list-hoy');
-            if (studentsInCourse.length === 0) {
-                studentListEl.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">No hay estudiantes ${selectedCourse ? `en el curso <strong>${selectedCourse}</strong>` : 'agregados'}.</p>`;
-                container.querySelector('#status-counter').textContent = '';
             } else {
-                const attendanceRecord = appData.attendance[dateKey] || {};
-                studentsInCourse.forEach(student => {
-                    const record = attendanceRecord[student.id] || { status: 'ausente', justified: false };
-                    studentListEl.innerHTML += createAttendanceCardHTML(student, record);
-                });
-                updateStatusAndCounter(dateKey, studentsInCourse);
-                container.querySelector('#student-list-hoy').addEventListener('click', handleAttendanceClick);
-                container.querySelector('#mark-all-btn').addEventListener('click', (e) => handleMarkAllClick(e, studentsInCourse));
-            }
+                const course = appData.courses.find(c => c.id === selectedCourseIdForAttendance);
+                const studentsInCourse = appData.students.filter(s => s.courseId === selectedCourseIdForAttendance);
 
-            const changeCourseBtn = container.querySelector('#change-course-btn');
-            if (changeCourseBtn) {
-                changeCourseBtn.addEventListener('click', () => {
-                    selectedCourse = null;
+                container.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <button id="back-to-courses-btn" class="text-sm font-medium text-[var(--accent-green)] hover:underline">&lt; Volver a Cursos</button>
+                        <div id="status-counter" class="text-sm font-medium"></div>
+                    </div>
+                    <h2 class="text-xl font-bold mb-2">${course ? course.name : 'Curso no encontrado'}</h2>
+                    <button id="mark-all-btn" class="btn-primary w-full mb-4 text-sm">Marcar Todos</button>
+                    <div id="student-list-hoy" class="space-y-3"></div>`;
+
+                const studentListEl = container.querySelector('#student-list-hoy');
+                if (studentsInCourse.length === 0) {
+                    studentListEl.innerHTML = `<p class="text-center mt-10">No hay estudiantes asignados a este curso.</p>`;
+                    container.querySelector('#status-counter').textContent = '';
+                    container.querySelector('#mark-all-btn').classList.add('hidden');
+                } else {
+                    let studentListHTML = '';
+                    studentsInCourse.forEach(student => {
+                        const attendanceRecord = appData.attendance[dateKey] || {};
+                        const record = attendanceRecord[student.id] || { status: 'ausente', justified: false };
+                        studentListHTML += createAttendanceCardHTML(student, record);
+                    });
+                    studentListEl.innerHTML = studentListHTML;
+                    animateListItems('#student-list-hoy');
+                    updateStatusAndCounter(dateKey);
+                }
+                
+                container.querySelector('#student-list-hoy').addEventListener('click', handleAttendanceClick);
+                container.querySelector('#mark-all-btn').addEventListener('click', handleMarkAllClick);
+                container.querySelector('#back-to-courses-btn').addEventListener('click', () => {
+                    selectedCourseIdForAttendance = null;
                     renderAttendanceList(dateKey);
                 });
             }
         }
 
         function renderStudentManagementList() {
-            const container = document.getElementById('view-estudiantes');
-            container.innerHTML = `<form id="add-student-form" class="mb-6 flex flex-wrap gap-4 items-end"><div class="flex-grow"><label for="student-name-input" class="text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label><input type="text" id="student-name-input" placeholder="Nombre del Alumno" class="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600" required></div><div class="flex-grow"><label for="student-course-input" class="text-sm font-medium text-gray-700 dark:text-gray-300">Curso</label><input type="text" id="student-course-input" placeholder="Ej: 1ro A" class="w-full mt-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600" required></div><div><button type="submit" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg">Agregar</button></div></form><h2 class="text-lg font-semibold mb-2 dark:text-gray-200">Lista de Estudiantes</h2><div id="student-list-gestion" class="space-y-2"></div>`;
-            const studentListGestionEl = container.querySelector('#student-list-gestion');
-            container.querySelector('#add-student-form').addEventListener('submit', handleAddStudentSubmit);
+            const courseOptions = appData.courses.map(course => `<option value="${course.id}">${course.name}</option>`).join('');
+            views.estudiantes.innerHTML = `
+                <form id="add-student-form" class="mb-6 space-y-4">
+                    <input type="text" id="student-name-input" placeholder="Nombre del estudiante" class="input-styled" required>
+                    <select id="student-course-select" class="input-styled" required>
+                        <option value="">Selecciona un curso</option>
+                        ${courseOptions}
+                    </select>
+                    <button type="submit" class="btn-primary">Agregar Estudiante</button>
+                </form>
+                <h2 class="text-lg font-semibold mb-2">Lista de Estudiantes</h2>
+                <div id="student-list-gestion" class="space-y-2"></div>`;
+            
+            views.estudiantes.querySelector('#add-student-form').addEventListener('submit', handleAddStudentSubmit);
+            
+            const studentListGestionEl = views.estudiantes.querySelector('#student-list-gestion');
             studentListGestionEl.addEventListener('click', handleDeleteStudentClick);
 
-            if (!appData.students || appData.students.length === 0) {
-                studentListGestionEl.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">No hay estudiantes.</p>`;
+            if (appData.students.length === 0) {
+                studentListGestionEl.innerHTML = `<p class="text-center">No hay estudiantes.</p>`;
                 return;
             }
 
-            appData.students.sort((a, b) => a.name.localeCompare(b.name));
-            const studentsByCourse = appData.students.reduce((acc, student) => {
-                const course = student.course || 'Sin curso';
-                if (!acc[course]) { acc[course] = []; }
-                acc[course].push(student);
-                return acc;
-            }, {});
+            const sortedStudents = [...appData.students].sort((a, b) => {
+                const courseA = getCourseName(a.courseId);
+                const courseB = getCourseName(b.courseId);
+                if (courseA < courseB) return -1;
+                if (courseA > courseB) return 1;
+                return a.name.localeCompare(b.name);
+            });
 
-            studentListGestionEl.innerHTML = '';
-            const sortedCourses = Object.keys(studentsByCourse).sort();
-            for (const course of sortedCourses) {
-                studentListGestionEl.innerHTML += `<h3 class="text-md font-semibold text-gray-600 dark:text-gray-400 mt-4 mb-2">${course}</h3>`;
-                studentsByCourse[course].forEach(student => {
-                    studentListGestionEl.innerHTML += `<div class="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-700"><div class="flex items-center"><img src="${student.avatarUrl}" alt="${student.name}" class="w-10 h-10 rounded-full mr-3"/><span class="font-medium dark:text-gray-200">${student.name}</span></div><button class="delete-student-btn text-red-500 hover:text-red-700" data-id="${student.id}">Eliminar</button></div>`;
-                });
-            }
+            let currentCourseId = null;
+            let studentListHTML = '';
+            sortedStudents.forEach(student => {
+                if (student.courseId !== currentCourseId) {
+                    currentCourseId = student.courseId;
+                    studentListHTML += `<h3 class="text-md font-semibold mt-4 mb-2">${getCourseName(currentCourseId)}</h3>`;
+                }
+                studentListHTML += `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-soft-green)] dark:bg-[var(--gray-dark)]">
+                        <div class="flex items-center"><img src="${student.avatarUrl}" alt="${student.name}" class="w-10 h-10 rounded-full mr-3"/><span class="font-medium">${student.name}</span></div>
+                        <button class="delete-student-btn text-red-500 hover:text-red-700" data-id="${student.id}">Eliminar</button>
+                    </div>`;
+            });
+            studentListGestionEl.innerHTML = studentListHTML;
+            animateListItems('#student-list-gestion');
         }
 
+        function renderCourseManagementList() {
+            views.cursos.innerHTML = `
+                <form id="add-course-form" class="mb-6 flex gap-2">
+                    <input type="text" id="course-name-input" placeholder="Nombre del nuevo curso" class="input-styled flex-grow" required>
+                    <button type="submit" class="btn-primary px-4">Agregar</button>
+                </form>
+                <h2 class="text-lg font-semibold mb-2">Lista de Cursos</h2>
+                <div id="course-list-gestion" class="space-y-2"></div>`;
+            
+            const courseListGestionEl = views.cursos.querySelector('#course-list-gestion');
+            if (appData.courses.length === 0) {
+                courseListGestionEl.innerHTML = `<p class="text-center">No hay cursos registrados.</p>`;
+            } else {
+                let courseListHTML = '';
+                appData.courses.forEach(course => {
+                    courseListHTML += `
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-soft-green)] dark:bg-[var(--gray-dark)]">
+                            <span class="font-medium">${course.name}</span>
+                            <button class="delete-course-btn text-red-500 hover:text-red-700" data-id="${course.id}">Eliminar</button>
+                        </div>`;
+                });
+                courseListGestionEl.innerHTML = courseListHTML;
+                animateListItems('#course-list-gestion');
+            }
+
+            views.cursos.querySelector('#add-course-form').addEventListener('submit', handleAddCourseSubmit);
+            courseListGestionEl.addEventListener('click', handleDeleteCourseClick);
+        }
+        
         function renderCalendar() {
-            const container = document.getElementById('view-agenda');
-            container.innerHTML = `<div class="flex items-center justify-between mb-4"><button id="prev-month-btn" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">&lt;</button><h2 id="month-year-header" class="text-lg font-semibold dark:text-gray-200"></h2><button id="next-month-btn" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">&gt;</button></div><div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center"></div>`;
-            const calendarGridEl = container.querySelector('#calendar-grid');
-            const monthYearHeaderEl = container.querySelector('#month-year-header');
-            const year = currentDate.getFullYear(); const month = currentDate.getMonth();
-            monthYearHeaderEl.textContent = currentDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-            const firstDayOfMonth = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
-            ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'].forEach(day => { calendarGridEl.innerHTML += `<div class="font-bold text-gray-500 text-xs">${day}</div>`; });
-            for (let i = 0; i < firstDayOfMonth; i++) { calendarGridEl.innerHTML += '<div></div>'; }
-            for (let day = 1; day <= daysInMonth; day++) {
-                const loopDate = new Date(year, month, day); const dayOfWeek = loopDate.getDay();
-                if (dayOfWeek === 0 || dayOfWeek === 6) { calendarGridEl.innerHTML += `<div class="p-2 text-gray-400 dark:text-gray-600">${day}</div>`;
-                } else {
-                    const dateKey = toISODateString(loopDate);
-                    const attendanceRecord = appData.attendance ? appData.attendance[dateKey] : undefined;
-                    let cellClass = "p-2 rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-800";
-                    if (attendanceRecord && Object.keys(attendanceRecord).length > 0) {
-                        const presentCount = Object.values(attendanceRecord).filter(r => r.status === 'presente').length;
-                        if (appData.students && presentCount === appData.students.length && appData.students.length > 0) cellClass += " bg-green-200 dark:bg-green-800";
-                        else cellClass += " bg-yellow-200 dark:bg-yellow-800";
+            const container = views.agenda;
+
+            if (!selectedDateForAgenda) {
+                container.innerHTML = `
+                <div id="agenda-container-wrapper">
+                    <div id="calendar-container">
+                        <div class="flex items-center justify-between mb-4">
+                            <button id="prev-month-btn" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">&lt;&lt;</button>
+                            <h2 id="month-year-header" class="text-lg font-semibold"></h2>
+                            <button id="next-month-btn" class="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">&gt;&gt;</button>
+                        </div>
+                        <div id="calendar-grid"></div>
+                    </div>
+                </div>`;
+
+                const calendarGridEl = views.agenda.querySelector('#calendar-grid');
+                const monthYearHeaderEl = views.agenda.querySelector('#month-year-header');
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                monthYearHeaderEl.textContent = currentDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'].forEach(day => { calendarGridEl.innerHTML += `<div class="font-bold text-xs">${day}</div>`; });
+                for (let i = 0; i < firstDayOfMonth; i++) { calendarGridEl.innerHTML += '<div></div>'; }
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const loopDate = new Date(year, month, day);
+                    const dayOfWeek = loopDate.getDay();
+                    if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        calendarGridEl.innerHTML += `<div class="p-2 text-gray-400 dark:text-gray-600">${day}</div>`;
+                    } else {
+                        const dateKey = toISODateString(loopDate);
+                        const attendanceRecord = appData.attendance[dateKey];
+                        let cellClass = "p-2 rounded-full cursor-pointer hover:bg-[var(--bg-soft-green)] dark:hover:bg-[var(--bg-dark-green)]";
+                        if (attendanceRecord && Object.keys(attendanceRecord).length > 0) {
+                            const presentCount = Object.values(attendanceRecord).filter(r => r.status === 'presente').length;
+                            if (presentCount === appData.students.length && appData.students.length > 0) cellClass += " bg-green-200 dark:bg-green-800";
+                            else cellClass += " bg-yellow-200 dark:bg-yellow-800";
+                        }
+                        calendarGridEl.innerHTML += `<div class="${cellClass}" data-date="${dateKey}">${day}</div>`;
                     }
-                    calendarGridEl.innerHTML += `<div class="${cellClass}" data-date="${dateKey}">${day}</div>`;
+                }
+                views.agenda.querySelector('#calendar-container').addEventListener('click', handleCalendarClick);
+                views.agenda.querySelector('#prev-month-btn').addEventListener('click', (e) => { e.stopPropagation(); currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+                views.agenda.querySelector('#next-month-btn').addEventListener('click', (e) => { e.stopPropagation(); currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+            } else {
+                const dateKey = selectedDateForAgenda;
+                const selectedDay = new Date(dateKey + 'T00:00:00');
+
+                if (!selectedCourseIdForAttendance) {
+                    container.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <button id="back-to-calendar-btn" class="text-sm font-medium text-[var(--accent-green)] hover:underline">&lt; Volver al Calendario</button>
+                        </div>
+                        <h2 class="text-xl font-bold mb-4">Asistencia para ${selectedDay.toLocaleDateString('es-ES', { month: 'long', day: 'numeric' })}</h2>
+                        <div id="course-selection-hoy" class="space-y-3"></div>
+                    `;
+                    const courseListEl = container.querySelector('#course-selection-hoy');
+                    if (appData.courses.length === 0) {
+                        courseListEl.innerHTML = `<p class="text-center mt-10">No hay cursos definidos. Ve a la pestaña 'Cursos' para agregar uno.</p>`;
+                    } else {
+                        let courseSelectionHTML = '<h2 class="text-xl font-bold mb-4 text-center">Selecciona un Curso</h2>';
+                        appData.courses.forEach(course => {
+                            courseSelectionHTML += `
+                                <div class="course-card p-4 rounded-xl bg-[var(--bg-soft-green)] dark:bg-[var(--gray-dark)] hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer text-center" data-course-id="${course.id}">
+                                    <h3 class="font-bold text-lg pointer-events-none">${course.name}</h3>
+                                </div>
+                            `;
+                        });
+                        courseListEl.innerHTML = courseSelectionHTML;
+                        animateListItems('#course-selection-hoy');
+                    }
+
+                    courseListEl.addEventListener('click', (e) => {
+                        const card = e.target.closest('.course-card');
+                        if (card) {
+                            selectedCourseIdForAttendance = card.dataset.courseId;
+                            renderCalendar();
+                        }
+                    });
+                } else {
+                    const course = appData.courses.find(c => c.id === selectedCourseIdForAttendance);
+                    const studentsInCourse = appData.students.filter(s => s.courseId === selectedCourseIdForAttendance);
+
+                    container.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <button id="back-to-courses-btn" class="text-sm font-medium text-[var(--accent-green)] hover:underline">&lt; Volver a Cursos</button>
+                            <div id="status-counter" class="text-sm font-medium"></div>
+                        </div>
+                        <h2 class="text-xl font-bold mb-2">${course ? course.name : 'Curso no encontrado'}</h2>
+                        <p class="text-md text-gray-500 dark:text-gray-400 mb-4">${selectedDay.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                        <button id="mark-all-btn" class="btn-primary w-full mb-4 text-sm">Marcar Todos</button>
+                        <div id="student-list-hoy" class="space-y-3"></div>`;
+
+                    const studentListEl = container.querySelector('#student-list-hoy');
+                    if (studentsInCourse.length === 0) {
+                        studentListEl.innerHTML = `<p class="text-center mt-10">No hay estudiantes asignados a este curso.</p>`;
+                        container.querySelector('#status-counter').textContent = '';
+                        container.querySelector('#mark-all-btn').classList.add('hidden');
+                    } else {
+                        let studentListHTML = '';
+                        studentsInCourse.forEach(student => {
+                            const attendanceRecord = appData.attendance[dateKey] || {};
+                            const record = attendanceRecord[student.id] || { status: 'ausente', justified: false };
+                            studentListHTML += createAttendanceCardHTML(student, record);
+                        });
+                        studentListEl.innerHTML = studentListHTML;
+                        animateListItems('#student-list-hoy');
+                        updateStatusAndCounter(dateKey);
+                    }
+                    
+                    container.querySelector('#student-list-hoy').addEventListener('click', handleAttendanceClick);
+                    container.querySelector('#mark-all-btn').addEventListener('click', handleMarkAllClick);
+                    container.querySelector('#back-to-courses-btn').addEventListener('click', () => {
+                        selectedCourseIdForAttendance = null;
+                        renderCalendar();
+                    });
+                }
+
+                const backToCalendarBtn = container.querySelector('#back-to-calendar-btn');
+                if (backToCalendarBtn) {
+                    backToCalendarBtn.addEventListener('click', () => {
+                        selectedDateForAgenda = null;
+                        selectedCourseIdForAttendance = null;
+                        renderCalendar();
+                    });
                 }
             }
-            calendarGridEl.addEventListener('click', handleCalendarClick);
-            container.querySelector('#prev-month-btn').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
-            container.querySelector('#next-month-btn').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
         }
 
         function renderReports() {
-            const container = document.getElementById('view-reportes');
-            if (!appData.students || appData.students.length === 0) { container.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">No hay estudiantes.</p>`; return; }
-            const reports = appData.students.map(student => {
-                const report = { studentName: student.name, avatarUrl: student.avatarUrl, total: 0, justified: 0, unjustified: 0 };
-                if(appData.attendance) for (const dateKey in appData.attendance) { const record = appData.attendance[dateKey][student.id]; if (record && record.status === 'ausente') { report.total++; if (record.justified) report.justified++; else report.unjustified++; } }
-                return report;
+            const container = views.reportes;
+
+            // State 1: No course selected, show course list
+            if (!selectedCourseIdForReports) {
+                container.innerHTML = `<div id="course-selection-reportes" class="space-y-3"></div>`;
+                const courseListEl = container.querySelector('#course-selection-reportes');
+                if (appData.courses.length === 0) {
+                    courseListEl.innerHTML = `<p class="text-center mt-10">No hay cursos definidos. Ve a la pestaña 'Cursos' para agregar uno.</p>`;
+                    return;
+                }
+
+                let courseSelectionHTML = '<h2 class="text-xl font-bold mb-4 text-center">Selecciona un Curso para Ver Reportes</h2>';
+                appData.courses.forEach(course => {
+                    courseSelectionHTML += `
+                        <div class="course-card-report p-4 rounded-xl bg-[var(--bg-soft-green)] dark:bg-[var(--gray-dark)] hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer text-center" data-course-id="${course.id}">
+                            <h3 class="font-bold text-lg pointer-events-none">${course.name}</h3>
+                        </div>
+                    `;
+                });
+                courseListEl.innerHTML = courseSelectionHTML;
+                animateListItems('#course-selection-reportes');
+
+                courseListEl.addEventListener('click', (e) => {
+                    const card = e.target.closest('.course-card-report');
+                    if (card) {
+                        selectedCourseIdForReports = card.dataset.courseId;
+                        renderReports();
+                    }
+                });
+                return;
+            }
+
+            const course = appData.courses.find(c => c.id === selectedCourseIdForReports);
+            const studentsInCourse = appData.students.filter(s => s.courseId === selectedCourseIdForReports);
+
+            // State 2: Course selected, no student selected, show student list
+            if (!selectedStudentIdForReport) {
+                let studentListHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <button id="back-to-courses-report-btn" class="text-sm font-medium text-[var(--accent-green)] hover:underline">&lt; Volver a Cursos</button>
+                    </div>
+                    <h2 class="text-xl font-bold mb-4">Selecciona un Estudiante de ${course ? course.name : ''}</h2>
+                    <div id="student-list-report" class="space-y-3"></div>
+                `;
+                container.innerHTML = studentListHTML;
+
+                const studentListEl = container.querySelector('#student-list-report');
+                if (studentsInCourse.length === 0) {
+                    studentListEl.innerHTML = `<p class="text-center mt-10">No hay estudiantes en este curso.</p>`;
+                } else {
+                    let studentListHTML = '';
+                    studentsInCourse.forEach(student => {
+                        // Calculate absences for each student
+                        let totalAbsences = 0;
+                        let justifiedAbsences = 0;
+                        let unjustifiedAbsences = 0;
+
+                        for (const dateKey in appData.attendance) {
+                            const record = appData.attendance[dateKey][student.id];
+                            if (record && record.status === 'ausente') {
+                                totalAbsences++;
+                                if (record.justified) {
+                                    justifiedAbsences++;
+                                } else {
+                                    unjustifiedAbsences++;
+                                }
+                            }
+                        }
+
+                        studentListHTML += `
+                            <div class="student-card-report p-4 rounded-xl bg-[var(--bg-soft-green)] dark:bg-[var(--gray-dark)] hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer" data-student-id="${student.id}">
+                                <div class="flex justify-between items-center pointer-events-none">
+                                    <div class="flex items-center">
+                                        <img src="${student.avatarUrl}" alt="${student.name}" class="w-12 h-12 rounded-full mr-4"/>
+                                        <span class="font-semibold">${student.name}</span>
+                                    </div>
+                                    <div class="text-right text-sm">
+                                        <p class="font-bold">Total Faltas: ${totalAbsences}</p>
+                                        <p class="text-red-500">Sin Justificar: ${unjustifiedAbsences}</p>
+                                        <p class="text-yellow-500">Justificadas: ${justifiedAbsences}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    studentListEl.innerHTML = studentListHTML;
+                    animateListItems('#student-list-report');
+                }
+
+                container.querySelector('#back-to-courses-report-btn').addEventListener('click', () => {
+                    selectedCourseIdForReports = null;
+                    renderReports();
+                });
+
+                studentListEl.addEventListener('click', (e) => {
+                    const card = e.target.closest('.student-card-report');
+                    if (card) {
+                        selectedStudentIdForReport = card.dataset.studentId;
+                        renderReports();
+                    }
+                });
+                return;
+            }
+
+            // State 3: Course and student selected, show detailed report
+            const student = appData.students.find(s => s.id === selectedStudentIdForReport);
+            if (!student) {
+                container.innerHTML = `<p>Estudiante no encontrado.</p>`;
+                return;
+            }
+
+            const absences = [];
+            for (const dateKey in appData.attendance) {
+                const record = appData.attendance[dateKey][student.id];
+                if (record && record.status === 'ausente') {
+                    absences.push({
+                        date: dateKey,
+                        justified: record.justified,
+                        note: record.justificationNote || ''
+                    });
+                }
+            }
+
+            let reportHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <button id="back-to-students-report-btn" class="text-sm font-medium text-[var(--accent-green)] hover:underline">&lt; Volver a Estudiantes</button>
+                </div>
+                <div class="flex items-center mb-4">
+                    <img src="${student.avatarUrl}" alt="${student.name}" class="w-16 h-16 rounded-full mr-4"/>
+                    <div>
+                        <h2 class="text-2xl font-bold">${student.name}</h2>
+                        <p class="text-gray-500 dark:text-gray-400">${getCourseName(student.courseId)}</p>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Resumen de Faltas</h3>
+            `;
+
+            if (absences.length === 0) {
+                reportHTML += `<p class="text-center mt-4">¡Este estudiante no tiene faltas!</p>`;
+            } else {
+                reportHTML += `<div class="space-y-3">`;
+                absences.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by most recent
+                absences.forEach(absence => {
+                    const formattedDate = new Date(absence.date + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    const isJustified = absence.justified;
+                    const note = absence.note;
+                    const cardClass = isJustified ? 'bg-yellow-100/50 border-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-800/50' : 'bg-red-100/50 border-red-200 dark:bg-red-900/30 dark:border-red-800/50';
+                    const statusText = isJustified ? 'Justificada' : 'Sin Justificar';
+
+                    reportHTML += `
+                        <div class="p-4 rounded-xl border ${cardClass}">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold">${formattedDate}</p>
+                                    <p class="text-sm font-bold ${isJustified ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}">${statusText}</p>
+                                </div>
+                                ${isJustified ? `<button class="add-note-btn text-xs py-1 px-2 rounded-md bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500" data-date="${absence.date}">${note ? 'Editar Nota' : 'Añadir Nota'}</button>` : ''}
+                            </div>
+                            ${note ? `<p class="text-sm mt-2 pt-2 border-t border-gray-300 dark:border-gray-600"><b>Nota:</b> ${note}</p>` : ''}
+                        </div>
+                    `;
+                });
+                reportHTML += `</div>`;
+            }
+
+            container.innerHTML = reportHTML;
+
+            container.querySelector('#back-to-students-report-btn').addEventListener('click', () => {
+                selectedStudentIdForReport = null;
+                renderReports();
             });
-            let content = '<div class="space-y-3">';
-            reports.forEach(report => { content += `<div class="p-4 rounded-xl border bg-white dark:bg-gray-800 dark:border-gray-700"><div class="flex items-center mb-3"><img src="${report.avatarUrl}" alt="${report.studentName}" class="w-11 h-11 rounded-full mr-4"/><span class="font-bold text-lg dark:text-gray-200">${report.studentName}</span></div><div class="grid grid-cols-3 text-center"><div><p class="text-2xl font-semibold text-red-500">${report.unjustified}</p><p class="text-xs text-gray-500">Sin Justificar</p></div><div><p class="text-2xl font-semibold text-yellow-500">${report.justified}</p><p class="text-xs text-gray-500">Justificadas</p></div><div><p class="text-2xl font-bold text-gray-700 dark:text-gray-300">${report.total}</p><p class="text-xs text-gray-500">Total Faltas</p></div></div></div>`; });
-            container.innerHTML = content + '</div>';
+
+            container.querySelectorAll('.add-note-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const dateKey = e.target.dataset.date;
+                    handleJustificationNote(student.id, dateKey);
+                });
+            });
         }
 
         function renderConfigView() {
-            const container = document.getElementById('view-configuracion');
             const isDark = document.documentElement.classList.contains('dark');
-            container.innerHTML = `<div class="space-y-8"><div><h2 class="text-lg font-semibold dark:text-gray-200 mb-2">Apariencia</h2><div class="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700"><label for="theme-toggle-checkbox" class="font-medium dark:text-gray-300">Modo Oscuro</label><div class="relative inline-block w-10 mr-2 align-middle"><input type="checkbox" id="theme-toggle-checkbox" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" ${isDark ? 'checked' : ''}/><label for="theme-toggle-checkbox" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label></div></div></div></div>`;
-            container.querySelector('#theme-toggle-checkbox').addEventListener('change', toggleTheme);
+            views.configuracion.innerHTML = `
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Apariencia</h3>
+                        <div class="flex items-center justify-between bg-[var(--bg-soft-green)] dark:bg-[var(--gray-dark)] p-4 rounded-xl">
+                            <label for="theme-toggle-checkbox" class="font-medium">Modo Oscuro</label>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" id="theme-toggle-checkbox" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" ${isDark ? 'checked' : ''}/>
+                                <label for="theme-toggle-checkbox" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Gestión de Datos</h3>
+                        <div class="bg-[var(--bg-soft-green)] dark:bg-[var(--gray-dark)] p-4 rounded-xl space-y-4">
+                            <button id="export-btn" class="btn-primary">Exportar Datos</button>
+                            <input type="file" id="import-file-input" accept=".json" class="hidden"/>
+                            <button id="import-btn" class="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Importar Datos</button>
+                        </div>
+                    </div>
+                </div>`;
+            views.configuracion.querySelector('#theme-toggle-checkbox').addEventListener('change', toggleTheme);
+            views.configuracion.querySelector('#export-btn').addEventListener('click', exportData);
+            views.configuracion.querySelector('#import-btn').addEventListener('click', () => document.getElementById('import-file-input').click());
+            views.configuracion.querySelector('#import-file-input').addEventListener('change', importData);
         }
 
-        // --- UTILITY & HELPER FUNCTIONS ---
-        const getInitials = (name) => { if (!name) return '??'; const words = name.trim().split(/\s+/); return words.length > 1 ? (words[0][0] + words[words.length - 1][0]).toUpperCase() : (words[0] ? words[0].substring(0, 2).toUpperCase() : '??'); };
-        const toISODateString = (date) => date.toISOString().split('T')[0];
-        function createAttendanceCardHTML(student, record) { const isPresent = record.status === 'presente'; const isJustified = record.justified; let statusText = isPresent ? 'Presente' : 'Ausente'; if (!isPresent && isJustified) statusText += ' (J)'; const cardClasses = isPresent ? 'bg-green-50 dark:bg-green-900/50' : (isJustified ? 'bg-yellow-50 dark:bg-yellow-900/50' : 'bg-red-50 dark:bg-red-900/50'); const statusBadgeColor = isPresent ? 'bg-green-500' : (isJustified ? 'bg-yellow-500' : 'bg-red-500'); const justifyButton = !isPresent && !isJustified ? `<button class="justify-btn text-xs py-1 px-2 rounded-md bg-gray-200 dark:bg-gray-600">Justificar</button>` : ''; return `<div class="flex items-center justify-between p-4 rounded-xl border dark:border-gray-700 shadow-sm cursor-pointer ${cardClasses}" data-id="${student.id}"><div class="flex items-center pointer-events-none"><img src="${student.avatarUrl}" alt="${student.name}" class="w-12 h-12 rounded-full mr-4"/><span class="font-semibold dark:text-gray-200">${student.name}</span></div><div class="flex items-center space-x-3"><span class="text-xs font-bold px-2 py-1 rounded-full text-white ${statusBadgeColor}">${statusText}</span>${justifyButton}</div></div>`; }
-        
-        function updateStatusAndCounter(dateKey, students) {
-            const container = document.getElementById('view-hoy');
-            if (!container) return;
-            const statusCounterEl = container.querySelector('#status-counter');
-            const markAllBtn = container.querySelector('#mark-all-btn');
-            if (!statusCounterEl) return;
+        // --- EVENT HANDLERS ---
+        async function handleJustificationNote(studentId, dateKey) {
+            const record = appData.attendance[dateKey][studentId];
+            const currentNote = record.justificationNote || '';
+            const newNote = prompt('Añade una nota para la justificación:', currentNote);
 
-            const attendanceRecord = appData.attendance ? appData.attendance[dateKey] || {} : {};
-            const presentCount = students.filter(s => (attendanceRecord[s.id] ? attendanceRecord[s.id].status : 'ausente') === 'presente').length;
-            const totalStudents = students.length;
-            
-            statusCounterEl.textContent = `${presentCount} / ${totalStudents} Presentes`;
-            if(markAllBtn) markAllBtn.textContent = presentCount === totalStudents ? 'Marcar Ausentes' : 'Marcar Presentes';
+            if (newNote !== null) { // prompt returns null if user cancels
+                record.justificationNote = newNote.trim();
+                await saveData();
+                renderReports(); // Re-render to show the new note
+            }
         }
 
-        // --- EVENT HANDLERS for main app ---
         async function handleAttendanceClick(e) {
             const cardEl = e.target.closest('[data-id]');
             if (!cardEl) return;
+
             const studentId = cardEl.dataset.id;
-            const dateKey = toISODateString(displayedDate);
+            const dateKey = currentView === 'agenda' ? selectedDateForAgenda : toISODateString(displayedDate);
+            
             if (!appData.attendance[dateKey]) appData.attendance[dateKey] = {};
             if (!appData.attendance[dateKey][studentId]) appData.attendance[dateKey][studentId] = { status: 'ausente', justified: false };
+
             if (e.target.classList.contains('justify-btn')) {
                 appData.attendance[dateKey][studentId].justified = true;
             } else {
@@ -461,68 +1157,237 @@
                 appData.attendance[dateKey][studentId].status = currentStatus === 'presente' ? 'ausente' : 'presente';
             }
             await saveData();
-            renderAttendanceList(dateKey);
+
+            if (currentView === 'agenda') {
+                renderCalendar();
+            } else {
+                renderAttendanceList(dateKey);
+            }
         }
 
-        async function handleMarkAllClick(e, students) {
-            const dateKey = toISODateString(displayedDate);
+        async function handleMarkAllClick() {
+            if (!selectedCourseIdForAttendance) return;
+
+            const dateKey = currentView === 'agenda' ? selectedDateForAgenda : toISODateString(displayedDate);
             if (!appData.attendance[dateKey]) appData.attendance[dateKey] = {};
-            const allPresent = students.every(s => appData.attendance[dateKey][s.id] && appData.attendance[dateKey][s.id].status === 'presente');
+            
+            const studentsInCourse = appData.students.filter(s => s.courseId === selectedCourseIdForAttendance);
+            const allPresent = studentsInCourse.length > 0 && studentsInCourse.every(s => appData.attendance[dateKey][s.id] && appData.attendance[dateKey][s.id].status === 'presente');
             const newStatus = allPresent ? 'ausente' : 'presente';
-            students.forEach(s => {
-                if (!appData.attendance[dateKey][s.id]) {
-                    appData.attendance[dateKey][s.id] = { status: 'ausente', justified: false };
-                }
-                appData.attendance[dateKey][s.id].status = newStatus;
+            
+            studentsInCourse.forEach(s => { 
+                appData.attendance[dateKey][s.id] = { status: newStatus, justified: false }; 
             });
+
             await saveData();
-            renderAttendanceList(dateKey);
+            
+            if (currentView === 'agenda') {
+                renderCalendar();
+            } else {
+                renderAttendanceList(dateKey);
+            }
         }
 
         async function handleAddStudentSubmit(e) {
             e.preventDefault();
-            const studentNameInput = document.getElementById('student-name-input');
-            const studentCourseInput = document.getElementById('student-course-input');
+            const studentNameInput = views.estudiantes.querySelector('#student-name-input');
+            const studentCourseSelect = views.estudiantes.querySelector('#student-course-select');
             const studentName = studentNameInput.value.trim();
-            const studentCourse = studentCourseInput.value.trim();
-            if (studentName && studentCourse) {
-                const newStudent = {
-                    id: `s_${Date.now()}`,
-                    name: studentName,
-                    course: studentCourse,
-                    avatarUrl: `https://placehold.co/100x100/d1d5db/ffffff?text=${getInitials(studentName)}`
-                };
-                if (!appData.students) appData.students = [];
+            const courseId = studentCourseSelect.value;
+
+            if (studentName && courseId) {
+                const newStudent = { id: `s_${Date.now()}`, name: studentName, avatarUrl: `https://placehold.co/100x100/d1d5db/ffffff?text=${getInitials(studentName)}`, courseId: courseId };
                 appData.students.push(newStudent);
                 await saveData();
                 renderStudentManagementList();
                 studentNameInput.value = '';
-                studentCourseInput.value = '';
+                studentCourseSelect.value = '';
+            } else {
+                alert('Por favor, ingresa el nombre del estudiante y selecciona un curso.');
             }
         }
 
         async function handleDeleteStudentClick(e) {
             if (e.target.classList.contains('delete-student-btn')) {
                 const studentId = e.target.dataset.id;
-                if (confirm('¿Seguro que quieres eliminar este estudiante?')) {
-                    if(appData.students) appData.students = appData.students.filter(s => s.id !== studentId);
-                    if(appData.attendance) Object.keys(appData.attendance).forEach(dateKey => { delete appData.attendance[dateKey][studentId]; });
+                if (confirm('¿Seguro que quieres eliminar este estudiante? Se borrará su historial de asistencia.')) {
+                    appData.students = appData.students.filter(s => s.id !== studentId);
+                    Object.keys(appData.attendance).forEach(dateKey => { delete appData.attendance[dateKey][studentId]; });
                     await saveData();
                     renderStudentManagementList();
                 }
             }
         }
 
-        function handleCalendarClick(e) {
-            if (e.target.dataset.date) {
-                const [year, month, day] = e.target.dataset.date.split('-').map(Number);
-                displayedDate = new Date(year, month - 1, day);
-                selectedCourse = null; // Reiniciar curso al cambiar de día
-                switchView('hoy');
+        async function handleAddCourseSubmit(e) {
+            e.preventDefault();
+            const courseNameInput = views.cursos.querySelector('#course-name-input');
+            const courseName = courseNameInput.value.trim();
+            if (courseName) {
+                const newCourse = { id: `c_${Date.now()}`, name: courseName };
+                appData.courses.push(newCourse);
+                await saveData();
+                renderCourseManagementList();
+                courseNameInput.value = '';
             }
         }
 
-        // --- INITIALIZE APP ---
+        async function handleDeleteCourseClick(e) {
+            if (e.target.classList.contains('delete-course-btn')) {
+                const courseId = e.target.dataset.id;
+                if (confirm('¿Seguro que quieres eliminar este curso? Los estudiantes asociados a este curso no se eliminarán, pero su curso se establecerá como "Sin Curso".')) {
+                    appData.courses = appData.courses.filter(c => c.id !== courseId);
+                    appData.students.forEach(student => {
+                        if (student.courseId === courseId) {
+                            student.courseId = null;
+                        }
+                    });
+                    await saveData();
+                    renderCourseManagementList();
+                    if (currentView === 'estudiantes') {
+                        renderStudentManagementList();
+                    }
+                }
+            }
+        }
+
+        function handleCalendarClick(e) {
+            if (e.target.dataset.date) {
+                selectedDateForAgenda = e.target.dataset.date;
+                renderCalendar();
+            }
+        }
+
+        // --- IMPORT/EXPORT & THEME ---
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `asistencia-backup-${toISODateString(new Date())}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (!importedData.students || !importedData.attendance) throw new Error('Formato de archivo incorrecto.');
+                    if (confirm('¿Reemplazar datos actuales con los del archivo?')) {
+                        appData = importedData;
+                        if (!appData.courses) {
+                            appData.courses = [];
+                        }
+                        saveData();
+                        alert('¡Datos importados!');
+                        switchView('hoy');
+                    }
+                } catch (error) { alert(`Error: ${error.message}`); }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        const THEME_KEY = 'theme';
+        function applyTheme(theme) {
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            const themeToggle = document.getElementById('theme-toggle-checkbox');
+            if (themeToggle) themeToggle.checked = theme === 'dark';
+        }
+
+        function toggleTheme() {
+            const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            localStorage.setItem(THEME_KEY, newTheme);
+            applyTheme(newTheme);
+        }
+
+        function loadInitialTheme() {
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(savedTheme || (systemPrefersDark ? 'dark' : 'light'));
+        }
+
+        // --- HTML FACTORIES ---
+        function createAttendanceCardHTML(student, record) {
+            const isPresent = record.status === 'presente';
+            const isJustified = record.justified;
+            let statusText = isPresent ? 'Presente' : 'Ausente';
+            if (!isPresent && isJustified) statusText += ' (J)';
+            const cardClasses = isPresent ? 'bg-green-100/50 border-green-200 dark:bg-green-900/30 dark:border-green-800/50' : (isJustified ? 'bg-yellow-100/50 border-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-800/50' : 'bg-red-100/50 border-red-200 dark:bg-red-900/30 dark:border-red-800/50');
+            const statusBadgeColor = isPresent ? 'bg-green-500' : (isJustified ? 'bg-yellow-500' : 'bg-red-500');
+            const justifyButton = !isPresent && !isJustified ? `<button class="justify-btn text-xs py-1 px-2 rounded-md bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500">Justificar</button>` : '';
+            return `
+                <div class="flex items-center justify-between p-3 rounded-xl border cursor-pointer ${cardClasses}" data-id="${student.id}">
+                    <div class="flex items-center pointer-events-none"><img src="${student.avatarUrl}" alt="${student.name}" class="w-12 h-12 rounded-full mr-4"/><span class="font-semibold">${student.name}</span></div>
+                    <div class="flex items-center space-x-3"><span class="text-xs font-bold px-2 py-1 rounded-full text-white ${statusBadgeColor}">${statusText}</span>${justifyButton}</div>
+                </div>`;
+        }
+
+        function updateStatusAndCounter(dateKey) {
+            if (!selectedCourseIdForAttendance) {
+                const statusCounterEl = views.hoy.querySelector('#status-counter');
+                if(statusCounterEl) statusCounterEl.textContent = '';
+                return;
+            };
+
+            const container = currentView === 'agenda' ? views.agenda : views.hoy;
+            const statusCounterEl = container.querySelector('#status-counter');
+            const attendanceRecord = appData.attendance[dateKey] || {};
+            const studentsInCourse = appData.students.filter(s => s.courseId === selectedCourseIdForAttendance);
+
+            if (studentsInCourse.length === 0) {
+                if(statusCounterEl) statusCounterEl.textContent = '0 / 0 Presentes';
+                return;
+            }
+
+            const presentCount = studentsInCourse.filter(s => (attendanceRecord[s.id] ? attendanceRecord[s.id].status : 'ausente') === 'presente').length;
+            if(statusCounterEl) statusCounterEl.textContent = `${presentCount} / ${studentsInCourse.length} Presentes`;
+            
+            const markAllBtn = container.querySelector('#mark-all-btn');
+            if (markAllBtn) {
+                const allPresent = presentCount === studentsInCourse.length;
+                markAllBtn.textContent = allPresent && studentsInCourse.length > 0 ? 'Marcar Ausentes' : 'Marcar Presentes';
+            }
+        }
+
+        function updateTodayIcon() {
+            const day = new Date().getDate();
+            const navHoySvg = navButtons.hoy.querySelector('svg');
+            if (navHoySvg) {
+                const textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                textElement.setAttribute("x", "50%");
+                textElement.setAttribute("y", "60%");
+                textElement.setAttribute("text-anchor", "middle");
+                textElement.setAttribute("font-size", "9");
+                textElement.setAttribute("fill", "currentColor");
+                textElement.textContent = day;
+                navHoySvg.appendChild(textElement);
+            }
+        }
+
+        // --- INITIALIZATION ---
+        function initializeApp() {
+            navButtons.hoy.addEventListener('click', () => { 
+                displayedDate = new Date(); 
+                selectedCourseIdForAttendance = null;
+                switchView('hoy'); 
+            });
+            navButtons.estudiantes.addEventListener('click', () => switchView('estudiantes'));
+            navButtons.cursos.addEventListener('click', () => switchView('cursos'));
+            navButtons.agenda.addEventListener('click', () => switchView('agenda'));
+            navButtons.reportes.addEventListener('click', () => switchView('reportes'));
+            navButtons.configuracion.addEventListener('click', () => switchView('configuracion'));
+
+            loadInitialTheme();
+            updateTodayIcon(); // Add this call
+            switchView('hoy');
+        }
+        
         initAuth();
     });
     </script>
