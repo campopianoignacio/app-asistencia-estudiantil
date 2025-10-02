@@ -2,8 +2,8 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 // 2. Crear una instancia de Express
 const app = express();
@@ -15,72 +15,81 @@ app.use(express.json());
 // --- Configuración ---
 const PORT = 3000;
 const JWT_SECRET = 'una-clave-secreta-muy-dificil-de-adivinar';
+// IMPORTANTE: Reemplaza la siguiente URL con la URL de conexión de tu base de datos de MongoDB Atlas
+const MONGO_URI = 'mongodb+srv://ignaciocampopiano_db_user:JcqS2FL4F3LE7aH6@cluster0.vqdvyrq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
-// --- Base de Datos Persistente (archivo JSON) ---
-const DB_PATH = path.join(__dirname, 'db.json');
-let users = [];
+// --- Conexión a la Base de Datos ---
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('Conectado a MongoDB Atlas'))
+  .catch(err => console.error('Error al conectar a MongoDB:', err));
 
-function loadDatabase() {
-  try {
-    if (fs.existsSync(DB_PATH)) {
-      const data = fs.readFileSync(DB_PATH, 'utf8');
-      users = JSON.parse(data);
-      console.log('Base de datos cargada correctamente.');
-    } else {
-      console.log('No se encontró db.json. Se creará uno nuevo al guardar datos.');
-    }
-  } catch (error) {
-    console.error('Error al cargar la base de datos:', error);
+// --- Esquema y Modelo de Usuario ---
+const UserSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  data: {
+    students: { type: Array, default: [] },
+    attendance: { type: Object, default: {} },
+    courses: { type: Array, default: [] }
   }
-}
+});
 
-function saveDatabase() {
-  try {
-    fs.writeFileSync(DB_PATH, JSON.stringify(users, null, 2), 'utf8');
-    console.log('Base de datos guardada correctamente.');
-  } catch (error) {
-    console.error('Error al guardar la base de datos:', error);
-  }
-}
+const User = mongoose.model('User', UserSchema);
 
 // ===================================================================================
 // RUTAS DE LA API
 // ===================================================================================
 
 app.get('/', (req, res) => {
-  res.send('¡El backend está funcionando con autenticación JWT y persistencia de datos!');
+  res.send('¡El backend está funcionando con autenticación JWT y persistencia en MongoDB!');
 });
 
 // --- Rutas de Autenticación ---
 
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ message: 'El email y la contraseña son requeridos.' });
-  if (users.find(user => user.email === email)) return res.status(400).json({ message: 'El email ya está registrado.' });
-  
-  const newUser = {
-    id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
-    email,
-    password, // En una app real, esto debería estar "hasheado" con bcrypt
-    data: { students: [], attendance: {}, courses: [] }
-  };
-  users.push(newUser);
-  saveDatabase(); // Guardar en el archivo
-  
-  console.log('Usuario registrado:', newUser);
-  res.status(201).json({ message: 'Usuario registrado con éxito.' });
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'El email ya está registrado.' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+      data: { students: [], attendance: {}, courses: [] }
+    });
+
+    await newUser.save();
+    
+    console.log('Usuario registrado:', email);
+    res.status(201).json({ message: 'Usuario registrado con éxito.' });
+  } catch (error) {
+    console.error('Error en el registro:', error);
+    res.status(500).json({ message: 'Error en el servidor al intentar registrar.' });
+  }
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ message: 'El email y la contraseña son requeridos.' });
 
-  const user = users.find(u => u.email === email);
-  if (!user || user.password !== password) return res.status(401).json({ message: 'Email o contraseña incorrectos.' });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: 'Email o contraseña incorrectos.' });
 
-  const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '8h' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: 'Email o contraseña incorrectos.' });
 
-  res.json({ accessToken: accessToken });
+    const accessToken = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '8h' });
+
+    res.json({ accessToken: accessToken });
+  } catch (error) {
+    console.error('Error en el login:', error);
+    res.status(500).json({ message: 'Error en el servidor al intentar iniciar sesión.' });
+  }
 });
 
 // --- Middleware de Autenticación ---
@@ -90,36 +99,46 @@ function authenticateToken(req, res, next) {
 
   if (token == null) return res.sendStatus(401);
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) return res.sendStatus(403);
-    req.user = user;
+    req.userId = decoded.id;
     next();
   });
 }
 
 // --- Rutas de Datos (Protegidas) ---
 
-app.get('/api/data', authenticateToken, (req, res) => {
-  const user = users.find(u => u.id === req.user.id);
-  if (!user) return res.status(404).send('Usuario no encontrado.');
+app.get('/api/data', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).send('Usuario no encontrado.');
 
-  console.log(`Enviando datos para el usuario ${user.email}`);
-  res.json(user.data);
+    console.log(`Enviando datos para el usuario ${user.email}`);
+    res.json(user.data);
+  } catch (error) {
+    console.error('Error al obtener datos:', error);
+    res.status(500).json({ message: 'Error en el servidor al obtener datos.' });
+  }
 });
 
-app.post('/api/data', authenticateToken, (req, res) => {
-  const user = users.find(u => u.id === req.user.id);
-  if (!user) return res.status(404).send('Usuario no encontrado.');
+app.post('/api/data', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).send('Usuario no encontrado.');
 
-  user.data = req.body;
-  saveDatabase(); // Guardar en el archivo
-  console.log(`Datos guardados para el usuario ${user.email}`);
-  res.status(200).send('Datos guardados con éxito.');
+    user.data = req.body;
+    await user.save();
+    
+    console.log(`Datos guardados para el usuario ${user.email}`);
+    res.status(200).send('Datos guardados con éxito.');
+  } catch (error) {
+    console.error('Error al guardar datos:', error);
+    res.status(500).json({ message: 'Error en el servidor al guardar datos.' });
+  }
 });
 
 
 // 5. Iniciar el servidor
 app.listen(PORT, () => {
-  loadDatabase(); // Cargar la base de datos al iniciar
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
